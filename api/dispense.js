@@ -1,6 +1,16 @@
 // api/dispense.js : รับคำขอขายยา แล้วเรียกฟังก์ชัน sell_drug ใน Supabase ด้วย secret key
 // secret key อยู่ใน Vercel เท่านั้น ห้ามอยู่ใน repo ห้ามอยู่ในหน้าเว็บ
 // (ตรงกับแม่แบบภาคผนวก ก.7 วันที่ 2 ต่างเพียงแก้เครื่องหมาย || ที่ docx แสดงเป็น ││)
+// เพิ่ม: ต้องส่งรหัสทาง header x-admin-code ให้ตรงกับ ADMIN_CODE ใน Vercel (แบบเดียวกับ api/admin.js)
+//   เพราะเว็บเปิดสาธารณะแล้ว ถ้าไม่ตรวจ ใครรู้ลิงก์ก็ส่งคำขอขายยาตัดสต็อกได้
+//   GET ยังตอบ 405 ก่อนตรวจรหัส ไฟดวงที่ 3 ใน status.html จึงยังผ่าน
+const crypto = require('crypto');
+
+function sameCode(a, b) {
+  const x = Buffer.from(String(a)), y = Buffer.from(String(b));
+  return x.length === y.length && crypto.timingSafeEqual(x, y);
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') {
@@ -8,8 +18,13 @@ module.exports = async (req, res) => {
   }
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY;
-  if (!url || !key) {
-    return res.status(500).json({ ok: false, message: 'ยังไม่ได้ตั้ง SUPABASE_URL หรือ SUPABASE_SECRET_KEY ใน Vercel' });
+  const code = process.env.ADMIN_CODE;
+  if (!url || !key || !code) {
+    return res.status(500).json({ ok: false, message: 'ยังไม่ได้ตั้ง SUPABASE_URL, SUPABASE_SECRET_KEY หรือ ADMIN_CODE ใน Vercel' });
+  }
+  // รหัสส่งทาง header ไม่ใส่ใน URL หรือ body
+  if (!sameCode(req.headers['x-admin-code'] || '', code)) {
+    return res.status(401).json({ ok: false, message: 'รหัสไม่ถูกต้อง' });
   }
   let b = req.body;
   if (typeof b === 'string') { try { b = JSON.parse(b); } catch { b = {}; } }
