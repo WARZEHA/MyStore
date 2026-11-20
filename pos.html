@@ -274,9 +274,9 @@
 <script>
   // ตั้งโหมดสีก่อนหน้าเว็บแสดง กันจอกะพริบ (จำค่าที่เลือกไว้ในเบราว์เซอร์ ไม่ใช่ข้อมูลสำคัญ)
   (function () {
-    var t = 'dark';
-    try { t = localStorage.getItem('rx_theme') || 'dark'; } catch (e) { /* ใช้โหมดมืด */ }
-    document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+    var t = 'light';
+    try { t = localStorage.getItem('rx_theme') || 'light'; } catch (e) { /* ใช้โหมดสว่าง (ค่าเริ่มต้น) */ }
+    document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
   })();
 </script>
 <style id="theme">

@@ -168,10 +168,10 @@
 
   /* มาสคอตแคปซูลยาวิ่งไปมาที่ขอบล่าง (วาดเอง ไม่ใช่ตัวละครที่มีลิขสิทธิ์) */
   .runner {
-    position: fixed; left: 0; bottom: 10px; z-index: 50; width: 72px; height: 76px;
-    animation: run-x 16s linear infinite;
+    position: fixed; left: 0; top: 0; z-index: 50; width: 72px; height: 76px;
+    touch-action: none; user-select: none; will-change: transform;   /* ตำแหน่งคุมด้วย JavaScript */
   }
-  .runner-face { width: 100%; height: 100%; animation: turn 16s linear infinite; }
+  .runner-face { width: 100%; height: 100%; }
   .runner-body { width: 100%; height: 100%; animation: hop .36s ease-in-out infinite; transform-origin: 50% 100%; }
   .runner svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 6px 10px rgba(30, 215, 96, .35)); }
   .leg-a, .leg-b { transform-box: fill-box; transform-origin: 50% 0; }
@@ -193,7 +193,12 @@
                    border: 6px solid transparent; border-top-color: #fff; }
   .runner.talk .bubble { opacity: 1; }
   .runner.jump .runner-body { animation: jump .6s ease-out; }
-  .runner:hover, .runner:hover .runner-face { animation-play-state: paused; }
+  /* ถูกจับ: แขนขาดิ้นรัว / ลอยกลางอากาศ / เวียนหัว: ไม่กระเด้ง ไม่มีฝุ่น */
+  .runner.held .leg-a, .runner.held .leg-b, .runner.held .arm-a, .runner.held .arm-b,
+  .runner.fly .leg-a, .runner.fly .leg-b, .runner.fly .arm-a, .runner.fly .arm-b { animation-duration: .12s; }
+  .runner.held .runner-body, .runner.fly .runner-body, .runner.dizzy .runner-body { animation: none; }
+  .runner.held .dust, .runner.fly .dust, .runner.dizzy .dust { display: none; }
+  .runner.dizzy .leg-a, .runner.dizzy .leg-b, .runner.dizzy .arm-a, .runner.dizzy .arm-b { animation-play-state: paused; }
   @keyframes run-x {
     0%   { transform: translateX(-90px); }
     50%  { transform: translateX(calc(100vw + 10px)); }
@@ -209,7 +214,10 @@
   /* นกน้อยคาบยา (วาดเอง) บินไปเกาะการ์ดต่าง ๆ และร้องภาษานก ตำแหน่งคุมด้วย JavaScript ไม่บังการกด */
   .bird { position: fixed; top: 0; left: 0; z-index: 40; width: 92px; height: 72px; pointer-events: none;
           transform: translate(-140px, 60px); will-change: transform; }
-  .bird-face { width: 100%; height: 100%; transition: transform .25s; }
+  .bird-face { width: 100%; height: 100%; transition: transform .25s; pointer-events: auto; touch-action: none; user-select: none; }
+  .bird.held .bird-face, .bird.tumble .bird-face { transition: none; }
+  .bird.held .wing { animation-duration: .07s; }     /* ถูกจับ: กระพือปีกรัว */
+  .bird.tumble .wing { animation-duration: .12s; }
   .bird-bob { width: 100%; height: 100%; animation: bird-bob .45s ease-in-out infinite alternate; transform-origin: 50% 90%; }
   .bird svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .45)); }
   .wing { transform-box: fill-box; transform-origin: 85% 80%; animation: flap .22s ease-in-out infinite alternate; }
@@ -245,9 +253,9 @@
 <script>
   // ตั้งโหมดสีก่อนหน้าเว็บแสดง กันจอกะพริบ (จำค่าที่เลือกไว้ในเบราว์เซอร์ ไม่ใช่ข้อมูลสำคัญ)
   (function () {
-    var t = 'dark';
-    try { t = localStorage.getItem('rx_theme') || 'dark'; } catch (e) { /* ใช้โหมดมืด */ }
-    document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+    var t = 'light';
+    try { t = localStorage.getItem('rx_theme') || 'light'; } catch (e) { /* ใช้โหมดสว่าง (ค่าเริ่มต้น) */ }
+    document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
   })();
 </script>
 <style id="theme">
@@ -571,15 +579,54 @@
     spot.style.setProperty('--my', e.clientY + 'px');
   }, { passive: true });
 
-  // นกน้อย: บินโค้งไปเกาะขอบบนของการ์ด/กล่อง เกาะ 2–4 วินาที ร้องภาษานก แล้วบินต่อ
-  // ตอนเกาะจะขยับตามการ์ดที่ลอยอยู่ทุกเฟรม ทุก 5 รอบบินออกนอกจอแล้วกลับมา
+  // ===== ตัวช่วยลาก-โยน: จับด้วยเมาส์หรือนิ้ว ลากตาม ปล่อยแล้วส่งความเร็วตอนปล่อย (px/วินาที) =====
+  function makeDraggable(el, h) {
+    let down = null, samples = [], moved = false;
+    el.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      const r = el.getBoundingClientRect();
+      down = { id: e.pointerId, ox: e.clientX - r.left, oy: e.clientY - r.top, sx: e.clientX, sy: e.clientY };
+      moved = false;
+      samples = [{ t: performance.now(), x: e.clientX, y: e.clientY }];
+      try { el.setPointerCapture(e.pointerId); } catch (err) { /* บางเบราว์เซอร์จับไม่ได้ ลากต่อได้ตามปกติ */ }
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!down || e.pointerId !== down.id) return;
+      if (!moved && Math.hypot(e.clientX - down.sx, e.clientY - down.sy) < 6) return;   // ขยับนิดเดียว = แตะ
+      if (!moved) { moved = true; h.grab(); }
+      h.move(e.clientX - down.ox, e.clientY - down.oy);
+      samples.push({ t: performance.now(), x: e.clientX, y: e.clientY });
+      if (samples.length > 8) samples.shift();
+    });
+    const end = (e) => {
+      if (!down || e.pointerId !== down.id) return;
+      down = null;
+      if (!moved) { if (h.tap) h.tap(); return; }
+      const now = performance.now();
+      const recent = samples.filter((s) => now - s.t < 110);
+      let vx = 0, vy = 0;
+      if (recent.length > 1) {                             // ความเร็วจากการลากช่วงท้าย
+        const a = recent[0], b = recent[recent.length - 1];
+        const dt = Math.max(16, b.t - a.t) / 1000;
+        vx = (b.x - a.x) / dt; vy = (b.y - a.y) / dt;
+        const sp = Math.hypot(vx, vy), MAX = 2600;
+        if (sp > MAX) { vx *= MAX / sp; vy *= MAX / sp; }
+      }
+      h.release(vx, vy);
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+  }
+
+  // ===== นกน้อย: บินโค้งไปเกาะการ์ด ร้องภาษานก / จับลากได้ โยนแล้วหมุนติ้ว ตั้งหลักแล้วบินต่อ =====
   (function birdBrain() {
     const bird = document.getElementById('bird');
     const face = bird.querySelector('.bird-face');
     const bub = document.getElementById('bird-bubble');
     const CHIRPS = ['จิ๊บ ๆ!', 'ทวีต ทวีต~', 'จิ๊บจิ๊บ ♪', 'ชิริ๊ป!', 'ทวิ๊ด~', 'จิ๊บ? จิ๊บ!', '♪ ทวีต ♪', 'จิ๊บบบ~', 'ปิ๊ป ปิ๊ป!'];
-    const W = 92, FEET = 63;           // ความกว้างนก และระยะจากหัวถึงเท้า (px)
-    let x = -140, y = 60, facing = 1, trips = 0, last = null, chirpTimer = null;
+    const W = 92, H = 72, FEET = 63;   // ขนาดนก และระยะจากหัวถึงเท้า (px)
+    let x = -140, y = 60, facing = 1, angle = 0, trips = 0, last = null, chirpTimer = null;
+    let token = 0;                     // เปลี่ยนค่าเมื่อถูกจับ เพื่อหยุดการบินที่ค้างอยู่
 
     const perchSpots = () => [...document.querySelectorAll('#menu .btn, .stat, .logo, .notice')];
     function perchPoint(el, frac) {
@@ -588,15 +635,17 @@
     }
     function place() {
       bird.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
-      face.style.transform = 'scaleX(' + facing + ')';
+      face.style.transform = 'scaleX(' + facing + ') rotate(' + angle.toFixed(1) + 'deg)';
     }
-    function chirp() {
-      bub.textContent = CHIRPS[Math.floor(Math.random() * CHIRPS.length)];
+    function chirp(text, ms) {
+      bub.textContent = text || CHIRPS[Math.floor(Math.random() * CHIRPS.length)];
       bird.classList.add('talk');
       clearTimeout(chirpTimer);
-      chirpTimer = setTimeout(() => bird.classList.remove('talk'), 1900);
+      chirpTimer = setTimeout(() => bird.classList.remove('talk'), ms || 1900);
     }
+    function later(fn, ms) { const my = token; setTimeout(() => { if (my === token) fn(); }, ms); }
     function flyTo(getEnd, done) {
+      const my = token;
       bird.classList.remove('perched', 'landing');
       const sx = x, sy = y, e0 = getEnd();
       const dist = Math.hypot(e0.x - sx, e0.y - sy);
@@ -604,6 +653,7 @@
       const lift = Math.min(170, 40 + dist * 0.25);     // ความสูงของวงโค้ง
       const t0 = performance.now();
       (function step(now) {
+        if (my !== token) return;                        // ถูกจับระหว่างบิน
         const t = Math.min(1, (now - t0) / dur);
         const k = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;   // ease in-out
         const e = getEnd();                               // ปลายทางขยับได้ (การ์ดลอย)
@@ -616,13 +666,15 @@
       })(t0);
     }
     function perch(el, frac, ms, done) {
+      const my = token;
       bird.classList.add('perched', 'landing');
-      setTimeout(() => bird.classList.remove('landing'), 360);
+      later(() => bird.classList.remove('landing'), 360);
       facing = perchPoint(el, frac).x + W / 2 < innerWidth / 2 ? 1 : -1;   // หันเข้ากลางจอ
-      setTimeout(chirp, 250);
-      if (ms > 3200) setTimeout(chirp, 2300);              // เกาะนานร้องสองครั้ง
+      later(chirp, 250);
+      if (ms > 3200) later(chirp, 2300);                  // เกาะนานร้องสองครั้ง
       const t0 = performance.now();
       (function step(now) {
+        if (my !== token) return;
         const p = perchPoint(el, frac);
         x = p.x; y = p.y; place();
         if (now - t0 < ms) requestAnimationFrame(step); else done();
@@ -632,7 +684,7 @@
       trips++;
       if (trips % 5 === 0) {                             // บินออกนอกจอแล้วกลับมา
         const off = { x: Math.random() < .5 ? -150 : innerWidth + 60, y: 30 + Math.random() * 140 };
-        flyTo(() => off, () => setTimeout(next, 1500));
+        flyTo(() => off, () => later(next, 1500));
         return;
       }
       const all = perchSpots();
@@ -645,31 +697,149 @@
       const frac = .2 + Math.random() * .6;
       flyTo(() => perchPoint(el, frac), () => perch(el, frac, 2200 + Math.random() * 2000, next));
     }
+
+    makeDraggable(face, {
+      grab() {
+        token++;                                          // หยุดบิน/เกาะที่ค้างอยู่
+        bird.classList.remove('perched', 'landing', 'tumble');
+        bird.classList.add('held');
+        chirp('จิ๊บ!? ปล่อยน้าา~', 60000);
+      },
+      move(nx, ny) {
+        if (nx > x + 1) facing = 1; else if (nx < x - 1) facing = -1;
+        x = nx; y = ny; angle = Math.sin(performance.now() / 70) * 10; place();
+      },
+      release(vx, vy) {
+        const my = ++token;
+        bird.classList.remove('held');
+        bird.classList.add('tumble');
+        const fast = Math.hypot(vx, vy) > 400;
+        chirp(fast ? 'จิ๊บบบบ~!!' : 'จิ๊บ?', 1200);
+        let spin = vx * 0.6, t0 = performance.now(), prev = t0;
+        (function step(now) {
+          if (my !== token) return;
+          const dt = Math.min(.05, (now - prev) / 1000); prev = now;
+          const drag = Math.pow(.18, dt);                 // แรงต้านอากาศ
+          vx *= drag; vy = vy * drag + 260 * dt;          // ตกลงช้า ๆ
+          spin *= Math.pow(.3, dt);
+          x += vx * dt; y += vy * dt; angle += spin * dt;
+          if (x < 0) { x = 0; vx = -vx * .7; spin = -spin; }
+          if (x > innerWidth - W) { x = innerWidth - W; vx = -vx * .7; spin = -spin; }
+          if (y < 0) { y = 0; vy = -vy * .7; }
+          if (y > innerHeight - H) { y = innerHeight - H; vy = -vy * .7; }
+          if (Math.abs(vx) > 5) facing = vx > 0 ? 1 : -1;
+          place();
+          const slow = Math.hypot(vx, vy) < 70 && Math.abs(spin) < 60;
+          if (!slow && now - t0 < 2600) { requestAnimationFrame(step); return; }
+          // ตั้งหลัก: หมุนกลับตรง ร้องตกใจ แล้วบินต่อ
+          bird.classList.remove('tumble');
+          const a0 = angle, target = Math.round(angle / 360) * 360, s0 = performance.now();
+          (function settle(n2) {
+            if (my !== token) return;
+            const k = Math.min(1, (n2 - s0) / 350);
+            angle = a0 + (target - a0) * k; place();
+            if (k < 1) { requestAnimationFrame(settle); return; }
+            angle = 0; place();
+            chirp('จิ๊บ!! 😵', 1300);
+            later(next, 900);
+          })(s0);
+        })(t0);
+      },
+      tap() { chirp(); },
+    });
+
     place();
-    setTimeout(next, 700);
+    later(next, 700);
   })();
 
-  // มาสคอต: พูดเองเป็นระยะ (แสดง 3.5 วินาที เว้น 1.5 วินาที วนข้อความ) กดแล้วกระโดดและพูดทันที
+  // ===== แคปซูลน้อย: วิ่งไปมาที่พื้น พูดเอง / จับลากได้ โยนแล้วตกตามแรงโน้มถ่วง เด้ง หมุน เวียนหัวแล้ววิ่งต่อ =====
   // ข้อความคงที่ ใส่ด้วย textContent
   const SAYINGS = ['สวัสดี!', 'สู้ ๆ นะ!', 'อย่าลืมดื่มน้ำ!', 'ยาพร้อมขายแล้ว!', 'กินยาให้ตรงเวลานะ',
-                   'พักสายตาบ้างนะ', 'วันนี้ก็สดใส!', 'นกน้อยส่งยามาแล้ว!'];
+                   'พักสายตาบ้างนะ', 'วันนี้ก็สดใส!', 'นกน้อยส่งยามาแล้ว!', 'ลองจับฉันโยนดูสิ!'];
   const runner = document.getElementById('runner');
+  const runFace = runner.querySelector('.runner-face');
   const bubble = document.getElementById('bubble');
+  const RW = 72, RH = 76, SPEED = 140, GRAVITY = 2200;
+  let rx = 24, ry = 0, rdir = 1, rvx = 0, rvy = 0, rang = 0, rspin = 0;
+  let rmode = 'run', hover = false, dizzyUntil = 0, lastT = performance.now(), lastOuch = 0;
   let sayIndex = 0, hideTimer = null;
+  const floorY = () => innerHeight - RH - 10;
+  ry = floorY();
+
   function say(text, ms) {
     bubble.textContent = text;
     runner.classList.add('talk');
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => runner.classList.remove('talk', 'jump'), ms);
   }
-  function sayNext() { say(SAYINGS[sayIndex++ % SAYINGS.length], 3500); }
+  function sayNext() { if (rmode === 'run') say(SAYINGS[sayIndex++ % SAYINGS.length], 3500); }
   setTimeout(sayNext, 800);
   setInterval(sayNext, 5000);
-  runner.addEventListener('click', function () {
-    runner.classList.remove('jump');
-    void runner.offsetWidth;           // เริ่มท่ากระโดดใหม่ทุกครั้งที่กด
-    runner.classList.add('jump');
-    say(SAYINGS[Math.floor(Math.random() * SAYINGS.length)], 2200);
+  function ouch(now, text) { if (now - lastOuch > 500) { say(text, 900); lastOuch = now; } }
+  function setMode(m) {
+    rmode = m;
+    runner.classList.toggle('held', m === 'held');
+    runner.classList.toggle('fly', m === 'fly');
+    runner.classList.toggle('dizzy', m === 'dizzy');
+  }
+  runner.addEventListener('pointerenter', () => { hover = true; });
+  runner.addEventListener('pointerleave', () => { hover = false; });
+
+  (function runStep(now) {
+    const dt = Math.min(.05, (now - lastT) / 1000); lastT = now;
+    const maxX = innerWidth - RW, fy = floorY();
+    if (rmode === 'run') {
+      if (!hover) rx += rdir * SPEED * dt;              // ชี้เมาส์แล้วหยุดให้จับง่าย
+      if (rx > maxX - 4) { rx = maxX - 4; rdir = -1; }
+      if (rx < 4) { rx = 4; rdir = 1; }
+      ry = fy; rang = 0;
+    } else if (rmode === 'held') {
+      rang = Math.sin(now / 80) * 14;                     // ดิ้นตอนถูกจับ
+    } else if (rmode === 'fly') {
+      rvy += GRAVITY * dt;
+      rx += rvx * dt; ry += rvy * dt; rang += rspin * dt;
+      if (rx < 0)    { rx = 0;    if (Math.abs(rvx) > 150) ouch(now, 'โอ๊ย!'); rvx = -rvx * .6; rspin = -rspin * .7; }
+      if (rx > maxX) { rx = maxX; if (Math.abs(rvx) > 150) ouch(now, 'โอ๊ย!'); rvx = -rvx * .6; rspin = -rspin * .7; }
+      if (ry < 0)    { ry = 0; rvy = -rvy * .5; }
+      if (ry >= fy) {
+        ry = fy;
+        if (rvy > 320) { rvy = -rvy * .45; rvx *= .75; rspin *= .6; ouch(now, 'ตุ้บ!'); }   // เด้ง
+        else {                                            // ตกถึงพื้นแล้ว
+          rvy = 0; setMode('dizzy'); dizzyUntil = now + 1300;
+          say('เวียนหัว~ 😵', 1400);
+        }
+      }
+    } else if (rmode === 'dizzy') {
+      const target = Math.round(rang / 360) * 360;
+      rang += (target - rang) * Math.min(1, dt * 8);      // หมุนกลับตั้งตรง
+      rx = Math.min(maxX, Math.max(0, rx + rvx * dt)); rvx *= Math.pow(.02, dt);   // ไถลแล้วหยุด
+      ry = fy;
+      if (now > dizzyUntil) { rang = 0; setMode('run'); }
+    }
+    runner.style.transform = 'translate(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px)';
+    runFace.style.transform = 'scaleX(' + rdir + ') rotate(' + rang.toFixed(1) + 'deg)';
+    requestAnimationFrame(runStep);
+  })(lastT);
+
+  makeDraggable(runner, {
+    grab() { setMode('held'); say('ปล่อยน้าา~', 60000); },
+    move(nx, ny) {
+      rx = Math.min(innerWidth - RW, Math.max(0, nx));
+      ry = Math.min(floorY(), Math.max(0, ny));
+    },
+    release(vx, vy) {
+      rvx = vx; rvy = vy; rspin = vx * 0.8;
+      if (Math.abs(vx) > 30) rdir = vx > 0 ? 1 : -1;
+      setMode('fly');
+      say(Math.hypot(vx, vy) > 500 ? 'ว้ายยย~!!' : 'อุ๊ย!', 1200);
+    },
+    tap() {                                               // แตะเบา ๆ = กระโดดและพูด
+      if (rmode !== 'run') return;
+      runner.classList.remove('jump');
+      void runner.offsetWidth;
+      runner.classList.add('jump');
+      say(SAYINGS[Math.floor(Math.random() * SAYINGS.length)], 2200);
+    },
   });
 
   // แถบสรุป: อ่าน /api/data (หมดเวลา 8 วินาที) ถ้าอ่านไม่ได้ก็ซ่อนแถบ หน้าเมนูยังใช้ได้ตามปกติ
