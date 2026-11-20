@@ -131,6 +131,40 @@
   }
   .btn:hover .ico { transform: rotate(-10deg) scale(1.15); }
   .ico { transition: transform .25s; }
+  /* ===== เอฟเฟกต์พื้นหลัง: แสงเคลื่อน + เม็ดยาลอยขึ้น + แสงตามเมาส์ (อยู่หลังเนื้อหา กดทะลุได้) ===== */
+  main { position: relative; z-index: 1; }
+  .bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .55; }
+  .blob.b1 { width: 520px; height: 520px; left: -140px; top: -120px; background: rgba(30, 215, 96, .28); animation: drift1 22s ease-in-out infinite; }
+  .blob.b2 { width: 460px; height: 460px; right: -160px; top: 30%; background: rgba(0, 170, 255, .16); animation: drift2 26s ease-in-out infinite; }
+  .blob.b3 { width: 420px; height: 420px; left: 25%; bottom: -200px; background: rgba(255, 164, 43, .12); animation: drift3 30s ease-in-out infinite; }
+  @keyframes drift1 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(220px, 140px) scale(1.15); } }
+  @keyframes drift2 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-240px, -120px) scale(1.2); } }
+  @keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(180px, -160px) scale(.9); } }
+  .particle { position: absolute; bottom: -60px; color: var(--accent); animation: rise linear infinite; }
+  .particle svg { display: block; width: 100%; height: 100%; animation: sway ease-in-out infinite alternate; animation-duration: inherit; }
+  @keyframes rise {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10%  { opacity: var(--o); }
+    90%  { opacity: var(--o); }
+    100% { transform: translateY(calc(-100vh - 120px)) rotate(var(--r)); opacity: 0; }
+  }
+  @keyframes sway { from { transform: translateX(-18px); } to { transform: translateX(18px); } }
+  /* ตาราง (grid) จาง ๆ ให้พื้นมีมิติ */
+  .bg::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%);
+            mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%);
+  }
+  .spot {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(320px circle at var(--mx, -500px) var(--my, -500px), rgba(30, 215, 96, .13), transparent 70%);
+    transition: opacity .3s;
+  }
+
   /* มาสคอตแคปซูลยาวิ่งไปมาที่ขอบล่าง (วาดเอง ไม่ใช่ตัวละครที่มีลิขสิทธิ์) */
   .runner {
     position: fixed; left: 0; bottom: 10px; z-index: 50; width: 72px; height: 76px;
@@ -182,6 +216,10 @@
 </style>
 </head>
 <body>
+<div class="bg" id="bg" aria-hidden="true">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+</div>
+<div class="spot" id="spot" aria-hidden="true"></div>
 <main>
   <div class="hero">
     <div class="logo" id="logo" aria-hidden="true"></div>
@@ -300,6 +338,48 @@
     li.append(a);
     menu.append(li);
   });
+
+  // พื้นหลัง: สุ่มเม็ดยา/กากบาท/วงกลมลอยขึ้นช้า ๆ (ตำแหน่ง ขนาด ความเร็ว ต่างกัน)
+  (function makeParticles() {
+    const bg = document.getElementById('bg');
+    const SHAPES = ['pill', 'cross', 'pill', 'dot'];
+    const SHAPE_PATHS = {
+      pill: ['M10.5 20.5l-7-7a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7z', 'M8.5 8.5l7 7'],
+      cross: ['M9 3h6v6h6v6h-6v6H9v-6H3V9h6z'],
+      dot: ['M12 6a6 6 0 1 0 0 12a6 6 0 1 0 0-12z'],
+    };
+    const count = window.innerWidth < 600 ? 12 : 22;
+    for (let i = 0; i < count; i++) {
+      const size = 14 + Math.random() * 24;
+      const dur = 16 + Math.random() * 18;
+      const p = document.createElement('span');
+      p.className = 'particle';
+      p.style.left = (Math.random() * 100) + '%';
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.animationDuration = dur + 's';
+      p.style.animationDelay = (-Math.random() * dur) + 's';   // เริ่มกระจายทั่วจอทันที
+      p.style.setProperty('--o', (0.10 + Math.random() * 0.18).toFixed(2));
+      p.style.setProperty('--r', (Math.random() < .5 ? -1 : 1) * (90 + Math.random() * 270) + 'deg');
+      if (Math.random() < .25) p.style.color = '#ffa42b';
+      const svg = icon('');            // SVG เปล่า (เส้นตาม currentColor) แล้วเติมรูปทรงที่สุ่มได้
+      const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+      for (const d of SHAPE_PATHS[shape]) {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        svg.append(path);
+      }
+      p.append(svg);
+      bg.append(p);
+    }
+  })();
+
+  // แสงตามเมาส์
+  const spot = document.getElementById('spot');
+  window.addEventListener('pointermove', function (e) {
+    spot.style.setProperty('--mx', e.clientX + 'px');
+    spot.style.setProperty('--my', e.clientY + 'px');
+  }, { passive: true });
 
   // มาสคอต: กดแล้วกระโดดและพูดข้อความสุ่ม (ข้อความคงที่ ใช้ textContent)
   const SAYINGS = ['สวัสดี!', 'สู้ ๆ นะ!', 'อย่าลืมดื่มน้ำ!', 'ยาพร้อมขายแล้ว!', 'กินยาให้ตรงเวลานะ'];
