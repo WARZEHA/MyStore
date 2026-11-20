@@ -212,6 +212,27 @@
   .type.dispense { color: var(--green); }
   .type.void { color: var(--red); }
   .type.return { color: var(--orange); }
+
+  /* เอฟเฟกต์ลอยและเคอร์เซอร์รูปมือ (ฟอร์มไม่ลอย เพื่อไม่รบกวนตอนพิมพ์) */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-5px); }
+  }
+  .logo { animation: float 3.5s ease-in-out infinite; }
+  .home-back, .drug, .round, .quick button, .btn-sell { cursor: pointer; }
+  .home-back { transition: transform .2s, border-color .2s, box-shadow .2s; }
+  .home-back:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(30, 215, 96, .18); }
+  .drug { transition: background .15s, border-color .15s, transform .18s, box-shadow .18s; }
+  .drug:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0, 0, 0, .45); border-color: rgba(30, 215, 96, .5); }
+  .round, .quick button { transition: transform .15s, border-color .15s, color .15s, box-shadow .15s; }
+  .round:hover, .quick button:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(30, 215, 96, .2); }
+  .btn-sell:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(30, 215, 96, .35); }
+  .card { transition: box-shadow .25s; }
+  .card:hover { box-shadow: 0 14px 34px rgba(0, 0, 0, .4); }
+  @media (prefers-reduced-motion: reduce) {
+    .logo { animation: none; }
+    .drug:hover, .round:hover, .quick button:hover, .btn-sell:hover:not(:disabled), .home-back:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
