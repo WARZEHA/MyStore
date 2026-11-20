@@ -172,6 +172,9 @@
     touch-action: none; user-select: none; will-change: transform;   /* ตำแหน่งคุมด้วย JavaScript */
   }
   .runner-face { width: 100%; height: 100%; }
+  /* จับได้เฉพาะตัวการ์ตูนจริง (ส่วนที่มีสี) พื้นที่ว่างในกรอบกดทะลุไปถึงปุ่มด้านหลังได้ */
+  .runner { pointer-events: none; }
+  .runner svg *, .bird svg * { pointer-events: visiblePainted; }
   .runner-body { width: 100%; height: 100%; animation: hop .36s ease-in-out infinite; transform-origin: 50% 100%; }
   .runner svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 6px 10px rgba(30, 215, 96, .35)); }
   .leg-a, .leg-b { transform-box: fill-box; transform-origin: 50% 0; }
@@ -214,7 +217,7 @@
   /* นกน้อยคาบยา (วาดเอง) บินไปเกาะการ์ดต่าง ๆ และร้องภาษานก ตำแหน่งคุมด้วย JavaScript ไม่บังการกด */
   .bird { position: fixed; top: 0; left: 0; z-index: 40; width: 92px; height: 72px; pointer-events: none;
           transform: translate(-140px, 60px); will-change: transform; }
-  .bird-face { width: 100%; height: 100%; transition: transform .25s; pointer-events: auto; touch-action: none; user-select: none; }
+  .bird-face { width: 100%; height: 100%; transition: transform .25s; touch-action: none; user-select: none; }
   .bird.held .bird-face, .bird.tumble .bird-face { transition: none; }
   .bird.held .wing { animation-duration: .07s; }     /* ถูกจับ: กระพือปีกรัว */
   .bird.tumble .wing { animation-duration: .12s; }
@@ -763,7 +766,9 @@
   let rx = 24, ry = 0, rdir = 1, rvx = 0, rvy = 0, rang = 0, rspin = 0;
   let rmode = 'run', hover = false, dizzyUntil = 0, lastT = performance.now(), lastOuch = 0;
   let sayIndex = 0, hideTimer = null;
-  const floorY = () => innerHeight - RH - 10;
+  // พื้นที่ยืน: ขอบล่างจอ หรือใต้ footer ถ้าเนื้อหายาวกว่าจอ (มือถือ) จะได้ไม่ยืนทับการ์ดเมนู
+  const footer = document.querySelector('footer');
+  const floorY = () => Math.max(innerHeight - RH - 10, footer.getBoundingClientRect().bottom + 24);
   ry = floorY();
 
   function say(text, ms) {
