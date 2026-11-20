@@ -11,69 +11,113 @@
   :root {
     --bg: #121212;
     --card: #181818;
-    --card-hover: #222222;
+    --card-hover: #202020;
+    --sub: #1f1f1f;
     --line: #2a2a2a;
     --text: #ffffff;
     --muted: #b3b3b3;
     --accent: #1ed760;
+    --orange: #ffa42b;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { margin: 0; }
   body {
-    background: var(--bg);
+    background:
+      radial-gradient(900px 420px at 15% -10%, rgba(30, 215, 96, .10), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
     color: var(--text);
     font-family: 'Noto Sans Thai', system-ui, sans-serif;
     font-size: 16px;
     line-height: 1.6;
+    min-height: 100vh;
   }
-  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 48px; }
-  h1 { font-size: 26px; margin: 0 0 4px; line-height: 1.4; }
-  .sub { color: var(--muted); margin: 0 0 24px; }
+  main { max-width: 880px; margin: 0 auto; padding: 40px 16px 48px; }
+
+  /* ส่วนหัว */
+  .hero { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .logo {
+    flex: none; width: 60px; height: 60px; border-radius: 18px;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, #1ed760, #13a648);
+    color: #0b2a17; box-shadow: 0 8px 24px rgba(30, 215, 96, .25);
+  }
+  .logo svg { width: 32px; height: 32px; }
+  h1 { font-size: 28px; margin: 0; line-height: 1.3; }
+  .sub { color: var(--muted); margin: 2px 0 0; }
+
+  /* แถบสรุปข้อมูลจาก /api/data */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 20px; }
+  .stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 12px 16px; min-width: 0;
+  }
+  .stat .v { font-size: 22px; font-weight: 700; line-height: 1.3; }
+  .stat .k { color: var(--muted); font-size: 14px; }
+  .stat.warn .v { color: var(--orange); }
+  .stat.ok .v { color: var(--accent); }
+  @media (max-width: 520px) { .stats { grid-template-columns: 1fr 1fr; } .stat:first-child { grid-column: 1 / -1; } }
+
   .notice {
-    border-left: 4px solid var(--accent);
-    background: var(--card);
-    color: var(--muted);
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin: 0 0 24px;
+    display: flex; gap: 10px; align-items: flex-start;
+    border: 1px solid rgba(30, 215, 96, .35);
+    background: rgba(30, 215, 96, .07);
+    padding: 12px 16px; border-radius: 12px; margin: 0 0 24px;
   }
-  .notice strong { color: var(--text); }
-  nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .notice svg { flex: none; width: 22px; height: 22px; color: var(--accent); margin-top: 1px; }
+
+  /* ปุ่มเมนู */
+  nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  @media (min-width: 700px) { nav ul { grid-template-columns: 1fr 1fr; } }
   .btn {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    min-height: 72px;
-    padding: 14px 20px;
+    position: relative;
+    display: flex; align-items: center; gap: 16px;
+    min-height: 96px; height: 100%;
+    padding: 18px 20px;
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 16px;
     color: var(--text);
     text-decoration: none;
-    transition: background .15s, border-color .15s;
+    transition: background .15s, border-color .15s, transform .15s;
   }
-  .btn:hover { background: var(--card-hover); border-color: var(--accent); }
+  .btn:hover { background: var(--card-hover); border-color: var(--accent); transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
   .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-  .num {
-    flex: none;
-    width: 40px; height: 40px;
-    border-radius: 50%;
+  .ico {
+    flex: none; width: 52px; height: 52px; border-radius: 14px;
     display: grid; place-items: center;
-    background: var(--accent); color: #121212;
-    font-weight: 700;
+    background: rgba(30, 215, 96, .12); color: var(--accent);
   }
+  .ico svg { width: 26px; height: 26px; }
+  .btn.primary { border-color: rgba(30, 215, 96, .45); }
+  .btn.primary .ico { background: var(--accent); color: #0b2a17; }
   .txt { display: flex; flex-direction: column; min-width: 0; }
-  .title { font-size: 18px; font-weight: 700; }
-  .desc { color: var(--muted); font-size: 16px; }
-  .arrow { margin-left: auto; color: var(--muted); font-size: 22px; }
-  footer { color: var(--muted); font-size: 14px; margin-top: 32px; text-align: center; }
+  .title { font-size: 19px; font-weight: 700; }
+  .desc { color: var(--muted); font-size: 15px; }
+  .arrow { margin-left: auto; color: var(--muted); font-size: 26px; transition: transform .15s, color .15s; }
+  .btn:hover .arrow { color: var(--accent); transform: translateX(3px); }
+  footer { color: var(--muted); font-size: 14px; margin-top: 36px; text-align: center; }
 </style>
 </head>
 <body>
 <main>
-  <h1>ร้านยาจำลอง</h1>
-  <p class="sub">เลือกหน้าที่ต้องการใช้งาน</p>
-  <p class="notice"><strong>ข้อมูลทั้งหมดเป็นข้อมูลจำลอง ห้ามใส่ชื่อผู้ป่วยจริง</strong></p>
+  <div class="hero">
+    <div class="logo" id="logo" aria-hidden="true"></div>
+    <div>
+      <h1>ร้านยาจำลอง</h1>
+      <p class="sub">เลือกหน้าที่ต้องการใช้งาน</p>
+    </div>
+  </div>
+
+  <div class="stats" id="stats" hidden aria-live="polite">
+    <div class="stat"><div class="v" id="st-asof">–</div><div class="k">ข้อมูล ณ วันที่</div></div>
+    <div class="stat ok"><div class="v" id="st-stock">–</div><div class="k">ยาที่มีของพร้อมขาย</div></div>
+    <div class="stat warn"><div class="v" id="st-low">–</div><div class="k">ต่ำกว่าจุดสั่งซื้อ</div></div>
+  </div>
+
+  <p class="notice"><span id="notice-ico" aria-hidden="true"></span><strong>ข้อมูลทั้งหมดเป็นข้อมูลจำลอง ห้ามใส่ชื่อผู้ป่วยจริง</strong></p>
   <nav aria-label="เมนูหลัก"><ul id="menu"></ul></nav>
   <footer>Workshop ร้านยาจำลอง</footer>
 </main>
@@ -81,24 +125,53 @@
   // รายการลิงก์ เพิ่มหรือลบหน้าได้ด้วยการแก้หนึ่งบรรทัด
   // หน้าที่ยังไม่ได้ push จะขึ้น 404 จนกว่าจะมีไฟล์นั้น (ไม่ต้องซ่อนปุ่ม)
   const LINKS = [
-    { href: 'pos.html',       title: 'หน้าขายยา',            desc: 'เลือกยา กรอกจำนวน บันทึกการจ่ายยา' },
-    { href: 'admin.html',     title: 'จัดการระบบ (ผู้ดูแล)',  desc: 'บัญชียา คลังรายล็อต รายการจ่าย ต้องใช้รหัสผู้ดูแล' },
-    { href: 'dashboard.html', title: 'Dashboard คลังยา',      desc: 'ภาพรวมคลัง ล็อตใกล้หมดอายุ ยาต่ำกว่าจุดสั่งซื้อ' },
-    { href: 'status.html',    title: 'ตรวจสถานะระบบ',         desc: 'ตรวจว่าการเชื่อมต่อแต่ละส่วนทำงานปกติ' },
+    { href: 'pos.html',       title: 'หน้าขายยา',            desc: 'เลือกยา กรอกจำนวน บันทึกการจ่ายยา', icon: 'pill' },
+    { href: 'admin.html',     title: 'จัดการระบบ (ผู้ดูแล)',  desc: 'บัญชียา คลังรายล็อต รายการจ่าย ต้องใช้รหัสผู้ดูแล', icon: 'sliders' },
+    { href: 'dashboard.html', title: 'Dashboard คลังยา',      desc: 'ภาพรวมคลัง ล็อตใกล้หมดอายุ ยาต่ำกว่าจุดสั่งซื้อ', icon: 'chart' },
+    { href: 'status.html',    title: 'ตรวจสถานะระบบ',         desc: 'ตรวจว่าการเชื่อมต่อแต่ละส่วนทำงานปกติ', icon: 'pulse' },
   ];
+
+  // ไอคอนเป็นเส้น SVG สร้างด้วย createElementNS (ไม่ใช้ไฟล์หรือ library ภายนอก)
+  const ICONS = {
+    pill: ['M10.5 20.5l-7-7a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7z', 'M8.5 8.5l7 7'],
+    sliders: ['M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1',
+              'M13 6a2 2 0 1 0 4 0a2 2 0 1 0-4 0', 'M7 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0', 'M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0'],
+    chart: ['M3 21h18', 'M6 17V11', 'M11 17V5', 'M16 17v-8', 'M21 17v-4'],
+    pulse: ['M3 12h4l3-8 4 16 3-8h4'],
+    cross: ['M9 3h6v6h6v6h-6v6H9v-6H3V9h6z'],
+    info: ['M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z', 'M12 11v6', 'M12 7.5v.5'],
+  };
+  function icon(name, width) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', width || '2');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    for (const d of ICONS[name] || []) {
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', d);
+      svg.append(p);
+    }
+    return svg;
+  }
+  document.getElementById('logo').append(icon('cross', '2.2'));
+  document.getElementById('notice-ico').replaceWith(icon('info'));
 
   // สร้างปุ่มด้วย createElement และ textContent (ไม่แทรก HTML จากข้อความ)
   const menu = document.getElementById('menu');
   LINKS.forEach(function (link, i) {
     const li = document.createElement('li');
     const a = document.createElement('a');
-    a.className = 'btn';
+    a.className = 'btn' + (i === 0 ? ' primary' : '');
     a.href = link.href;
 
-    const num = document.createElement('span');
-    num.className = 'num';
-    num.setAttribute('aria-hidden', 'true');
-    num.textContent = String(i + 1);
+    const ico = document.createElement('span');
+    ico.className = 'ico';
+    ico.setAttribute('aria-hidden', 'true');
+    ico.append(icon(link.icon));
 
     const txt = document.createElement('span');
     txt.className = 'txt';
@@ -115,10 +188,46 @@
     arrow.setAttribute('aria-hidden', 'true');
     arrow.textContent = '›';
 
-    a.append(num, txt, arrow);
+    a.append(ico, txt, arrow);
     li.append(a);
     menu.append(li);
   });
+
+  // แถบสรุป: อ่าน /api/data (หมดเวลา 8 วินาที) ถ้าอ่านไม่ได้ก็ซ่อนแถบ หน้าเมนูยังใช้ได้ตามปกติ
+  // ยอดใช้ได้ = ล็อต status active, expiry >= as_of, qty_on_hand > 0 (กติกาเดียวกับ pos และ dashboard)
+  (async function loadStats() {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    try {
+      const r = await fetch('/api/data', { cache: 'no-store', signal: ctrl.signal });
+      if (r.status !== 200) return;
+      const d = await r.json();
+      if (!d || !d.stock || !d.stock.meta || !Array.isArray(d.stock.items) || !d.drugs || !Array.isArray(d.drugs.items)) return;
+      const asOf = String(d.stock.meta.as_of).slice(0, 10);
+      const usable = {};
+      const hasLot = new Set();     // v_below_reorder นับเฉพาะยาที่มีล็อตในคลัง
+      for (const s of d.stock.items) {
+        hasLot.add(s.sku);
+        const exp = s.expiry ? String(s.expiry).slice(0, 10) : '';
+        if ((s.status || 'active') === 'active' && exp && exp >= asOf && Number(s.qty_on_hand) > 0) {
+          usable[s.sku] = (usable[s.sku] || 0) + Number(s.qty_on_hand);
+        }
+      }
+      const off = new Set((d.catalog && Array.isArray(d.catalog.items) ? d.catalog.items : [])
+        .filter((c) => c.is_active === false).map((c) => c.sku));
+      const drugs = d.drugs.items.filter((x) => !off.has(x.sku));
+      const inStock = drugs.filter((x) => usable[x.sku] > 0).length;
+      const low = drugs.filter((x) => hasLot.has(x.sku) && (usable[x.sku] || 0) < Number(x.reorder_level)).length;
+      document.getElementById('st-asof').textContent = asOf;
+      document.getElementById('st-stock').textContent = inStock + ' / ' + drugs.length;
+      document.getElementById('st-low').textContent = low + ' รายการ';
+      document.getElementById('stats').hidden = false;
+    } catch (e) {
+      // เปิดไฟล์ตรงหรือ API ใช้ไม่ได้: ไม่ต้องแสดงแถบสรุป
+    } finally {
+      clearTimeout(timer);
+    }
+  })();
 </script>
 </body>
 </html>

@@ -12,102 +12,36 @@
     --bg: #121212;
     --card: #181818;
     --sub: #1f1f1f;
+    --hover: #262626;
     --line: #2a2a2a;
     --border: #3e3e3e;
     --text: #ffffff;
     --muted: #b3b3b3;
     --green: #1ed760;
+    --green-bg: rgba(30, 215, 96, .10);
     --orange: #ffa42b;
+    --orange-bg: rgba(255, 164, 43, .12);
     --red: #f3727f;
+    --red-bg: rgba(243, 114, 127, .12);
     --pill: 9999px;
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   html, body { margin: 0; }
   body {
-    background: var(--bg);
+    background:
+      radial-gradient(900px 380px at 10% -10%, rgba(30, 215, 96, .08), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
     color: var(--text);
     font-family: 'Noto Sans Thai', system-ui, sans-serif;
     font-size: 16px;
     line-height: 1.6;
+    min-height: 100vh;
   }
-  main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; }
-  header.top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 12px; }
-  header.top h1 { font-size: 24px; margin: 0; line-height: 1.4; }
-  .back { color: var(--muted); text-decoration: none; }
-  .back:hover { color: var(--text); }
-  .meta { color: var(--muted); margin-left: auto; }
-  .badge {
-    display: inline-block; padding: 2px 12px; border-radius: var(--pill);
-    font-size: 14px; font-weight: 600; border: 1px solid currentColor;
-  }
-  .badge.ok { color: var(--green); }
-  .badge.warn { color: var(--orange); }
-  .notice { color: var(--muted); margin: 0 0 16px; }
-  .notice strong { color: var(--text); }
-  .fallback {
-    background: #3a2a0a; color: #ffd27a; border: 1px solid var(--orange);
-    padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-weight: 600;
-  }
-  .fatal {
-    background: #3a1418; color: #ffd1d6; border: 1px solid var(--red);
-    padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
-  }
-  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-  @media (min-width: 900px) { .grid { grid-template-columns: 1.1fr 0.9fr; } }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
-  .card h2 { font-size: 20px; margin: 0 0 12px; }
-  label { display: block; font-weight: 600; margin: 14px 0 6px; }
-  .hint { color: var(--muted); font-size: 14px; font-weight: 400; }
-  input, select {
-    width: 100%; min-height: 52px; padding: 10px 14px;
-    background: var(--sub); color: var(--text);
-    border: 1px solid var(--border); border-radius: 10px;
-    font: inherit; font-size: 17px;
-  }
-  input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible {
-    outline: 3px solid var(--green); outline-offset: 2px;
-  }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media (max-width: 560px) { .row2 { grid-template-columns: 1fr; } }
-  .drug-info {
-    margin-top: 12px; padding: 14px 16px; background: var(--sub);
-    border-radius: 10px; border: 1px solid var(--line);
-  }
-  .drug-info .name { font-weight: 700; font-size: 18px; }
-  .drug-info .usable { font-size: 28px; font-weight: 700; color: var(--green); }
-  .drug-info .usable.low { color: var(--orange); }
-  .drug-info .small { color: var(--muted); }
-  .low-tag {
-    display: inline-block; margin-left: 8px; padding: 2px 12px; border-radius: var(--pill);
-    background: rgba(255, 164, 43, .15); color: var(--orange); border: 1px solid var(--orange);
-    font-size: 14px; font-weight: 600; vertical-align: middle;
-  }
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-height: 56px; padding: 0 32px; border-radius: var(--pill);
-    border: 0; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
-  }
-  .btn.primary { background: var(--green); color: #121212; width: 100%; margin-top: 20px; }
-  .btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
-  .btn:disabled { background: #3e3e3e; color: #8a8a8a; cursor: not-allowed; }
-  .msg { margin-top: 16px; padding: 14px 16px; border-radius: 10px; }
-  .msg.err { background: #3a1418; border: 1px solid var(--red); color: #ffd1d6; }
-  .msg.ok { background: #0f2e1b; border: 1px solid var(--green); color: #c9f7d9; }
-  .msg .head { font-weight: 700; font-size: 18px; color: var(--text); }
-  .msg ul { margin: 6px 0; padding-left: 22px; }
-  table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { color: var(--muted); font-weight: 600; font-size: 14px; }
-  td.num, th.num { text-align: right; }
-  .table-wrap { overflow-x: auto; }
-  .type { font-size: 13px; padding: 1px 8px; border-radius: var(--pill); border: 1px solid currentColor; }
-  .type.dispense { color: var(--green); }
-  .type.void { color: var(--red); }
-  .type.return { color: var(--orange); }
-  .muted { color: var(--muted); }
-</style>
-<style>
+  button, input { font: inherit; }
+  :focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+
   /* ปุ่มกลับหน้าแรก (ใช้เหมือนกันทุกหน้า) */
   .home-back-bar { padding: 12px 16px 0; }
   .home-back {
@@ -116,18 +50,186 @@
     color: inherit; text-decoration: none; font-weight: 600; font-size: 15px;
   }
   .home-back:hover { border-color: #1ed760; }
-  .home-back:focus-visible { outline: 3px solid #1ed760; outline-offset: 2px; }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 16px 16px 48px; }
+
+  /* ส่วนหัว */
+  .app-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-bottom: 16px; }
+  .logo {
+    flex: none; width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center;
+    background: linear-gradient(135deg, #1ed760, #13a648); color: #0b2a17;
+    box-shadow: 0 8px 22px rgba(30, 215, 96, .22);
+  }
+  .logo svg { width: 28px; height: 28px; }
+  .app-head h1 { font-size: 26px; margin: 0; line-height: 1.3; }
+  .app-head .sub { color: var(--muted); font-size: 15px; }
+  .head-right { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: var(--pill);
+    font-size: 14px; font-weight: 600; border: 1px solid var(--border); color: var(--muted); background: var(--card);
+  }
+  .chip.ok { color: var(--green); border-color: rgba(30, 215, 96, .5); background: var(--green-bg); }
+  .chip.warn { color: var(--orange); border-color: rgba(255, 164, 43, .5); background: var(--orange-bg); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+  .notice {
+    display: flex; gap: 10px; align-items: center; margin: 0 0 16px; padding: 10px 16px;
+    border-radius: 12px; border: 1px solid rgba(30, 215, 96, .3); background: var(--green-bg);
+  }
+  .notice svg { flex: none; width: 20px; height: 20px; color: var(--green); }
+  .fallback, .fatal { padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; font-weight: 600; }
+  .fallback { background: #3a2a0a; color: #ffd27a; border: 1px solid var(--orange); }
+  .fatal { background: #3a1418; color: #ffd1d6; border: 1px solid var(--red); }
+
+  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
+  @media (min-width: 960px) { .grid { grid-template-columns: 1.15fr .85fr; } }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  }
+  .card-title { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 20px; }
+  .card-title svg { width: 22px; height: 22px; color: var(--green); }
+  .card-title .count { margin-left: auto; color: var(--muted); font-size: 14px; font-weight: 400; }
+
+  /* หัวข้อขั้นตอน */
+  .step { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; margin: 4px 0 10px; }
+  .step + .step, .divider { margin-top: 22px; }
+  .step-n {
+    width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--green); color: #0b2a17; font-size: 15px;
+  }
+
+  label { display: block; font-weight: 600; margin: 12px 0 6px; }
+  .hint { color: var(--muted); font-size: 14px; font-weight: 400; }
+  input {
+    width: 100%; min-height: 52px; padding: 10px 14px;
+    background: var(--sub); color: var(--text);
+    border: 1px solid var(--border); border-radius: 12px; font-size: 17px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30, 215, 96, .18); outline: none; }
+  input::placeholder { color: #7c7c7c; }
+  .search { position: relative; }
+  .search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--muted); pointer-events: none; }
+  .search input { padding-left: 44px; }
+
+  /* รายการยาให้แตะเลือก */
+  .drug-list {
+    margin-top: 10px; display: grid; gap: 8px; max-height: 340px; overflow-y: auto;
+    padding: 2px 4px 2px 0; overscroll-behavior: contain;
+  }
+  .drug {
+    display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 10px 14px;
+    text-align: left; color: var(--text); cursor: pointer;
+    background: var(--sub); border: 1px solid var(--line); border-radius: 14px;
+    transition: background .12s, border-color .12s;
+  }
+  .drug:hover { background: var(--hover); }
+  .drug[aria-pressed="true"] { border-color: var(--green); background: var(--green-bg); box-shadow: inset 4px 0 0 var(--green); }
+  .d-main { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+  .d-sku { font-weight: 700; }
+  .d-name { color: var(--muted); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .d-qty { text-align: right; flex: none; }
+  .d-qty b { display: block; font-size: 19px; line-height: 1.2; color: var(--green); }
+  .d-qty small { color: var(--muted); font-size: 13px; }
+  .drug.low .d-qty b { color: var(--orange); }
+  .empty { color: var(--muted); padding: 14px; text-align: center; border: 1px dashed var(--border); border-radius: 14px; }
+
+  .low-tag {
+    display: inline-flex; align-items: center; gap: 4px; padding: 1px 10px; border-radius: var(--pill);
+    background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange);
+    font-size: 13px; font-weight: 600; white-space: nowrap;
+  }
+
+  /* ยาที่เลือก */
+  .drug-info {
+    margin-top: 14px; padding: 16px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(30, 215, 96, .10), rgba(30, 215, 96, .02));
+    border: 1px solid rgba(30, 215, 96, .35);
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+  }
+  .drug-info .name { font-weight: 700; font-size: 18px; }
+  .drug-info .small { color: var(--muted); font-size: 14px; }
+  .usable-box { margin-left: auto; text-align: right; }
+  .usable { font-size: 32px; font-weight: 700; line-height: 1.1; color: var(--green); }
+  .usable.low { color: var(--orange); }
+
+  /* จำนวน */
+  .qty-row { display: flex; gap: 8px; align-items: stretch; }
+  .qty-row input { text-align: center; font-size: 22px; font-weight: 700; }
+  .round {
+    flex: none; width: 56px; min-height: 52px; border-radius: 14px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--sub); color: var(--text); font-size: 24px; font-weight: 700;
+  }
+  .round:hover { border-color: var(--green); color: var(--green); }
+  .quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .quick button {
+    min-height: 40px; padding: 0 16px; border-radius: var(--pill); cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--muted); font-weight: 600;
+  }
+  .quick button:hover { border-color: var(--green); color: var(--text); }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { .row2 { grid-template-columns: 1fr; } }
+
+  .btn-sell {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; min-height: 60px; margin-top: 22px; padding: 0 24px;
+    border-radius: var(--pill); border: 0; cursor: pointer;
+    background: var(--green); color: #0b2a17; font-size: 19px; font-weight: 700;
+    box-shadow: 0 8px 22px rgba(30, 215, 96, .25); transition: filter .15s, transform .1s;
+  }
+  .btn-sell:hover:not(:disabled) { filter: brightness(1.08); }
+  .btn-sell:active:not(:disabled) { transform: scale(.99); }
+  .btn-sell:disabled { background: #3e3e3e; color: #8a8a8a; cursor: not-allowed; box-shadow: none; }
+  .btn-sell svg { width: 22px; height: 22px; }
+  .spin { width: 20px; height: 20px; border-radius: 50%; border: 3px solid rgba(0,0,0,.25); border-top-color: #8a8a8a; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* กล่องผลลัพธ์ */
+  .msg { margin-top: 16px; padding: 16px; border-radius: 14px; display: flex; gap: 12px; align-items: flex-start; }
+  .msg > svg { flex: none; width: 26px; height: 26px; margin-top: 2px; }
+  .msg.err { background: var(--red-bg); border: 1px solid var(--red); color: #ffd1d6; }
+  .msg.err > svg { color: var(--red); }
+  .msg.ok { background: var(--green-bg); border: 1px solid var(--green); color: #d5f9e2; }
+  .msg.ok > svg { color: var(--green); }
+  .msg .head { font-weight: 700; font-size: 18px; color: var(--text); }
+  .lines { margin: 8px 0; display: grid; gap: 6px; }
+  .line { display: flex; justify-content: space-between; gap: 12px; padding: 6px 12px; border-radius: 10px; background: rgba(0,0,0,.25); }
+  .before-after { font-size: 17px; }
+  .before-after b { font-size: 20px; color: var(--text); }
+
+  /* ตารางรายการจ่าย */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 14px; }
+  tbody tr:hover { background: rgba(255,255,255,.03); }
+  tbody tr.new { background: var(--green-bg); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .type { font-size: 13px; padding: 1px 10px; border-radius: var(--pill); border: 1px solid currentColor; white-space: nowrap; }
+  .type.dispense { color: var(--green); }
+  .type.void { color: var(--red); }
+  .type.return { color: var(--orange); }
 </style>
 </head>
 <body>
 <nav class="home-back-bar" aria-label="กลับ"><a class="home-back" href="./index.html">‹ กลับหน้าแรก</a></nav>
 <main>
-  <header class="top">
-    <h1>หน้าขายยา</h1>
-    <span id="src-badge" class="badge" hidden></span>
-    <span class="meta" id="asof">กำลังโหลดข้อมูล…</span>
+  <header class="app-head">
+    <div class="logo" data-icon="pill" data-w="2.2" aria-hidden="true"></div>
+    <div>
+      <h1>หน้าขายยา</h1>
+      <div class="sub">ร้านยาจำลอง · เคาน์เตอร์จ่ายยา</div>
+    </div>
+    <div class="head-right">
+      <span id="src-badge" class="chip" hidden><span class="dot"></span><span id="src-text"></span></span>
+      <span class="chip" id="asof">กำลังโหลดข้อมูล…</span>
+    </div>
   </header>
-  <p class="notice"><strong>ข้อมูลจำลอง ห้ามใส่ชื่อผู้ป่วยจริง</strong></p>
+
+  <p class="notice"><span data-icon="info" aria-hidden="true"></span><strong>ข้อมูลจำลอง ห้ามใส่ชื่อผู้ป่วยจริง</strong></p>
   <div id="fallback" class="fallback" role="status" hidden>
     ข้อมูลสำรอง (อ่านจากไฟล์ ไม่ใช่ข้อมูลล่าสุด) ปิดปุ่มจ่ายยาไว้ก่อน
   </div>
@@ -135,52 +237,62 @@
 
   <div class="grid">
     <section class="card" aria-labelledby="h-sell">
-      <h2 id="h-sell">บันทึกการจ่ายยา</h2>
+      <h2 class="card-title" id="h-sell">บันทึกการจ่ายยา</h2>
       <form id="sell-form" novalidate>
-        <label for="q">ค้นหายา <span class="hint">รหัสหรือชื่อ</span></label>
-        <input id="q" type="search" autocomplete="off" placeholder="เช่น AMOX หรือ Amoxicillin">
-
-        <label for="sku">ยา <span class="hint" id="drug-count"></span></label>
-        <select id="sku"></select>
+        <div class="step"><span class="step-n">1</span> เลือกยา <span class="hint" id="drug-count"></span></div>
+        <div class="search">
+          <span data-icon="search" aria-hidden="true"></span>
+          <input id="q" type="search" autocomplete="off" placeholder="ค้นหารหัสหรือชื่อยา เช่น AMOX" aria-label="ค้นหายา">
+        </div>
+        <div class="drug-list" id="drug-list" role="group" aria-label="รายการยาที่มีของ"></div>
 
         <div class="drug-info" id="drug-info" hidden>
-          <div class="name" id="di-name"></div>
-          <div class="small" id="di-detail"></div>
-          <div>ยอดใช้ได้ <span class="usable" id="di-usable"></span> <span id="di-unit" class="small"></span>
-            <span class="low-tag" id="di-low" hidden>⚠ ต่ำกว่าจุดสั่งซื้อ</span></div>
-          <div class="small" id="di-rop"></div>
+          <div>
+            <div class="name" id="di-name"></div>
+            <div class="small" id="di-detail"></div>
+            <div class="small" id="di-rop"></div>
+            <span class="low-tag" id="di-low" hidden>⚠ ต่ำกว่าจุดสั่งซื้อ</span>
+          </div>
+          <div class="usable-box">
+            <div class="small">ยอดใช้ได้</div>
+            <div class="usable" id="di-usable"></div>
+            <div class="small" id="di-unit"></div>
+          </div>
         </div>
 
+        <div class="step divider"><span class="step-n">2</span> จำนวนและผู้รับยา</div>
+        <label for="qty">จำนวน</label>
+        <div class="qty-row">
+          <button type="button" class="round" id="minus" aria-label="ลดจำนวน">−</button>
+          <!-- ไม่ใส่ max ตั้งใจให้เซิร์ฟเวอร์เป็นผู้ตรวจยอดคงเหลือ -->
+          <input id="qty" type="number" inputmode="numeric" min="1" step="1" placeholder="0">
+          <button type="button" class="round" id="plus" aria-label="เพิ่มจำนวน">+</button>
+        </div>
+        <div class="quick" id="quick" aria-label="เลือกจำนวนเร็ว"></div>
+
         <div class="row2">
-          <div>
-            <label for="qty">จำนวน</label>
-            <!-- ไม่ใส่ max ตั้งใจให้เซิร์ฟเวอร์เป็นผู้ตรวจยอดคงเหลือ -->
-            <input id="qty" type="number" inputmode="numeric" min="1" step="1" placeholder="จำนวนเต็ม ≥ 1">
-          </div>
           <div>
             <label for="patient">รหัสผู้ป่วย</label>
             <input id="patient" type="text" autocomplete="off" placeholder="เช่น PT-9001">
           </div>
-        </div>
-        <div class="row2">
           <div>
             <label for="pharm">รหัสเภสัชกร</label>
             <input id="pharm" type="text" autocomplete="off" placeholder="เช่น RX-01">
           </div>
-          <div>
-            <!-- ส่วนเพิ่มจาก prompt: /api/dispense ต้องมีรหัสร้าน เพราะเว็บเปิดสาธารณะ -->
-            <label for="code">รหัสร้าน <span class="hint">รหัสเดียวกับหน้าผู้ดูแล</span></label>
-            <input id="code" type="password" autocomplete="off" placeholder="รหัสที่ผู้สอนให้">
-          </div>
         </div>
 
-        <button class="btn primary" id="sell-btn" type="submit" disabled>จ่ายยา</button>
+        <div class="step divider"><span class="step-n">3</span> ยืนยันการจ่าย</div>
+        <!-- ส่วนเพิ่มจาก prompt: /api/dispense ต้องมีรหัสร้าน เพราะเว็บเปิดสาธารณะ -->
+        <label for="code">รหัสร้าน <span class="hint">รหัสเดียวกับหน้าผู้ดูแล จำไว้จนปิดแท็บ</span></label>
+        <input id="code" type="password" autocomplete="off" placeholder="รหัสที่ผู้สอนให้">
+
+        <button class="btn-sell" id="sell-btn" type="submit" disabled>จ่ายยา</button>
       </form>
       <div id="result" aria-live="polite"></div>
     </section>
 
     <section class="card" aria-labelledby="h-log">
-      <h2 id="h-log">รายการจ่ายล่าสุด</h2>
+      <h2 class="card-title" id="h-log"><span data-icon="list" aria-hidden="true"></span>รายการจ่ายล่าสุด <span class="count">8 รายการล่าสุด</span></h2>
       <div class="table-wrap">
         <table>
           <thead><tr><th>เลขที่</th><th>วันเวลา</th><th>ยา / ล็อต</th><th class="num">จำนวน</th><th>ประเภท</th></tr></thead>
@@ -208,6 +320,7 @@ const LOCAL_ONLY_MSG = 'ทดสอบผ่านลิงก์ Vercel เท
 // ใช้ key เดียวกับ admin.html กรอกรหัสครั้งเดียวใช้ได้ทั้งสองหน้า (เก็บใน sessionStorage เท่านั้น)
 const KEY_CODE = 'rx_admin_code';
 const KEY_RX = 'rx_pharmacist_code';
+const QUICK_QTY = [10, 20, 30, 50, 100];
 
 /* =========================================================
    ตัวช่วยสร้าง DOM (ใช้ textContent เท่านั้น)
@@ -231,11 +344,45 @@ function ssGet(k) { try { return sessionStorage.getItem(k) || ''; } catch (e) { 
 function ssSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* ไม่มี storage ก็ใช้ได้ */ } }
 function ssDel(k) { try { sessionStorage.removeItem(k); } catch (e) { /* ignore */ } }
 
+// ไอคอนเส้น SVG สร้างด้วย createElementNS
+const ICONS = {
+  pill: ['M10.5 20.5l-7-7a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7z', 'M8.5 8.5l7 7'],
+  info: ['M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z', 'M12 11v6', 'M12 7.5v.5'],
+  search: ['M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14z', 'M20 20l-4-4'],
+  list: ['M8 6h13M8 12h13M8 18h13', 'M3.5 6h.01M3.5 12h.01M3.5 18h.01'],
+  check: ['M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z', 'M8 12.5l2.5 2.5L16 9.5'],
+  alert: ['M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z', 'M12 7.5v5.5', 'M12 16.5v.01'],
+  send: ['M5 12h14', 'M13 6l6 6-6 6'],
+};
+function icon(name, width) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', width || '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const d of ICONS[name] || []) {
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', d);
+    svg.append(p);
+  }
+  return svg;
+}
+for (const n of document.querySelectorAll('[data-icon]')) {
+  const svg = icon(n.dataset.icon, n.dataset.w);
+  if (n.classList.contains('logo')) n.append(svg); else n.replaceWith(svg);
+}
+
 /* =========================================================
    สถานะของหน้า
    ========================================================= */
-let STATE = null;       // { source, asOf, drugs:[{sku,...,usable}], log:[] }
+let STATE = null;       // { source, asOf, drugs:[{sku,...,usable}], log:[], names:{} }
+let selectedSku = '';   // ยาที่เลือกอยู่
 let busy = false;       // ระหว่างรอ /api/dispense
+let newIds = new Set(); // ใบจ่ายที่เพิ่งบันทึก (ไฮไลต์ในตาราง)
 
 /* =========================================================
    ขั้นที่ 1 โหลดข้อมูล
@@ -323,64 +470,91 @@ function buildState(source, raw) {
 /* =========================================================
    ขั้นที่ 3 แสดงผล
    ========================================================= */
+function isLow(d) {
+  const rop = Number(d.reorder_level);
+  return Number.isFinite(rop) && d.usable < rop;   // ตรงกับ v_below_reorder
+}
+
 function renderHeader() {
   const b = $('src-badge');
   b.hidden = false;
-  if (STATE.source === 'api') {
-    b.className = 'badge ok';
-    b.textContent = 'ข้อมูลล่าสุดจากฐานข้อมูล';
-  } else {
-    b.className = 'badge warn';
-    b.textContent = 'ข้อมูลสำรองจากไฟล์';
-  }
+  b.className = 'chip ' + (STATE.source === 'api' ? 'ok' : 'warn');
+  $('src-text').textContent = STATE.source === 'api' ? 'ข้อมูลล่าสุดจากฐานข้อมูล' : 'ข้อมูลสำรองจากไฟล์';
   $('asof').textContent = 'ข้อมูล ณ ' + STATE.asOf;
   $('fallback').hidden = STATE.source === 'api';
 }
 
 function drugLabel(d) {
-  return d.sku + ' · ' + str(d.generic_name) + (d.strength ? ' ' + d.strength : '');
+  return d.sku + ' ' + str(d.generic_name) + (d.strength ? ' ' + d.strength : '');
 }
 
-function renderOptions(keepSku) {
-  const sel = $('sku');
+function renderDrugList() {
+  const box = $('drug-list');
   const q = $('q').value.trim().toLowerCase();
   const list = STATE.drugs.filter((d) => !q || drugLabel(d).toLowerCase().includes(q));
-  sel.replaceChildren(el('option', { value: '' }, list.length ? '— เลือกยา —' : 'ไม่พบยาที่ค้นหา'));
+  box.replaceChildren();
+  if (!list.length) box.append(el('div', { class: 'empty' }, 'ไม่พบยาที่ค้นหา'));
   for (const d of list) {
-    const o = el('option', { value: d.sku }, drugLabel(d) + ' (ใช้ได้ ' + fmt(d.usable) + ')');
-    sel.append(o);
+    const low = isLow(d);
+    const btn = el('button', {
+      type: 'button', class: 'drug' + (low ? ' low' : ''), 'data-sku': d.sku,
+      'aria-pressed': d.sku === selectedSku ? 'true' : 'false',
+    },
+      el('span', { class: 'd-main' },
+        el('span', { class: 'd-sku' }, d.sku),
+        el('span', { class: 'd-name' }, str(d.generic_name) + (d.strength ? ' ' + d.strength : ''))),
+      low ? el('span', { class: 'low-tag' }, '⚠ ต่ำกว่าจุดสั่งซื้อ') : null,
+      el('span', { class: 'd-qty' }, el('b', null, fmt(d.usable)), el('small', null, str(d.unit))));
+    btn.addEventListener('click', () => selectDrug(d.sku));
+    box.append(btn);
   }
-  if (keepSku && list.some((d) => d.sku === keepSku)) sel.value = keepSku;
-  $('drug-count').textContent = 'มีของ ' + STATE.drugs.length + ' รายการ';
+  $('drug-count').textContent = '· มีของ ' + STATE.drugs.length + ' รายการ';
+}
+
+function selectDrug(sku) {
+  selectedSku = sku;
+  $('result').replaceChildren();
+  for (const b of $('drug-list').querySelectorAll('.drug')) {
+    b.setAttribute('aria-pressed', b.dataset.sku === sku ? 'true' : 'false');
+  }
   renderDrugInfo();
+  $('qty').focus({ preventScroll: true });
 }
 
 function selectedDrug() {
-  const sku = $('sku').value;
-  return STATE.drugs.find((d) => d.sku === sku) || null;
+  return (STATE && STATE.drugs.find((d) => d.sku === selectedSku)) || null;
 }
 
 function renderDrugInfo() {
   const d = selectedDrug();
   $('drug-info').hidden = !d;
   if (d) {
-    const rop = Number(d.reorder_level);
-    const low = Number.isFinite(rop) && d.usable < rop;   // ตรงกับ v_below_reorder
+    const low = isLow(d);
     $('di-name').textContent = d.sku + ' · ' + str(d.generic_name);
     $('di-detail').textContent = [d.strength, d.dosage_form, d.category].filter(Boolean).join(' · ');
     $('di-usable').textContent = fmt(d.usable);
     $('di-usable').className = 'usable' + (low ? ' low' : '');
     $('di-unit').textContent = str(d.unit);
     $('di-low').hidden = !low;
-    $('di-rop').textContent = Number.isFinite(rop) ? 'จุดสั่งซื้อ ' + fmt(rop) : '';
+    $('di-rop').textContent = Number.isFinite(Number(d.reorder_level)) ? 'จุดสั่งซื้อ ' + fmt(d.reorder_level) : '';
   }
   updateButton();
 }
 
 function updateButton() {
+  const btn = $('sell-btn');
   // ข้อมูลสำรองหรือระหว่างรอคำตอบ: ปิดปุ่ม
-  $('sell-btn').disabled = busy || !STATE || STATE.source !== 'api';
-  $('sell-btn').textContent = busy ? 'กำลังบันทึก…' : 'จ่ายยา';
+  btn.disabled = busy || !STATE || STATE.source !== 'api';
+  if (busy) {
+    btn.replaceChildren(el('span', { class: 'spin' }), 'กำลังบันทึก…');
+    return;
+  }
+  const d = selectedDrug();
+  const q = $('qty').value.trim();
+  const label = d && /^\d+$/.test(q) && Number(q) >= 1
+    ? 'จ่าย ' + d.sku + ' × ' + fmt(q) + (d.unit ? ' ' + d.unit : '')
+    : 'จ่ายยา';
+  btn.replaceChildren(icon('send'), label);
 }
 
 const TYPE_TH = { dispense: 'จ่าย', void: 'ยกเลิก', return: 'คืน' };
@@ -395,33 +569,34 @@ function renderLog() {
     const t = str(r.type) || 'dispense';
     const dt = str(r.datetime).slice(0, 16).replace('T', ' ');
     const name = STATE.names[r.sku] ? STATE.names[r.sku].generic_name : '';
-    body.append(el('tr', null,
+    body.append(el('tr', newIds.has(r.dispense_id) ? { class: 'new' } : null,
       el('td', null, str(r.dispense_id)),
-      el('td', null, dt),
+      el('td', null, dt.slice(0, 10), el('div', { class: 'muted' }, dt.slice(11))),
       el('td', null, str(r.sku), el('div', { class: 'muted' }, str(name) + (r.lot ? ' · ล็อต ' + r.lot : ''))),
       el('td', { class: 'num' }, fmt(r.qty)),
       el('td', null, el('span', { class: 'type ' + (TYPE_TH[t] ? t : '') }, TYPE_TH[t] || t))));
   }
 }
 
-function renderAll(keepSku) {
+function renderAll() {
+  if (selectedSku && !STATE.drugs.some((d) => d.sku === selectedSku)) selectedSku = '';
   renderHeader();
-  renderOptions(keepSku);
+  renderDrugList();
+  renderDrugInfo();
   renderLog();
 }
 
-async function refresh(keepSku) {
+async function refresh() {
   try {
     const { source, raw } = await loadData();
     STATE = buildState(source, raw);
     $('fatal').hidden = true;
-    renderAll(keepSku);
+    renderAll();
   } catch (e) {
     // โหลดทั้ง API และไฟล์สำรองไม่ได้ (เช่น เปิดไฟล์ด้วยการดับเบิลคลิก)
     $('fatal').hidden = false;
     $('fatal').textContent = 'โหลดข้อมูลไม่ได้ ' + LOCAL_ONLY_MSG;
-    $('asof').textContent = '';
-    STATE = STATE || null;
+    $('asof').textContent = 'ไม่มีข้อมูล';
     updateButton();
   }
 }
@@ -435,26 +610,32 @@ async function refresh(keepSku) {
    ========================================================= */
 function showError(text) {
   $('result').replaceChildren(el('div', { class: 'msg err', role: 'alert' },
-    el('div', { class: 'head' }, 'จ่ายไม่สำเร็จ'), el('div', null, text)));
+    icon('alert'),
+    el('div', null, el('div', { class: 'head' }, 'จ่ายไม่สำเร็จ'), el('div', null, text))));
 }
 
 function showSuccess(sku, data) {
   const lines = Array.isArray(data.lines) ? data.lines : [];
-  const ul = el('ul');
+  const box = el('div', { class: 'lines' });
   for (const l of lines) {
-    ul.append(el('li', null, 'ล็อต ' + str(l.lot) + ' จำนวน ' + fmt(l.qty) + ' (ใบจ่าย ' + str(l.dispense_id) + ')'));
+    box.append(el('div', { class: 'line' },
+      el('span', null, 'ล็อต ' + str(l.lot) + ' · ใบจ่าย ' + str(l.dispense_id)),
+      el('b', null, fmt(l.qty))));
   }
   $('result').replaceChildren(el('div', { class: 'msg ok', role: 'status' },
-    el('div', { class: 'head' }, 'จ่ายแล้ว ' + sku),
-    ul,
-    el('div', null, 'ยอดใช้ได้ ' + fmt(data.usable_before) + ' → ' + fmt(data.usable_after))));
+    icon('check'),
+    el('div', { style: 'flex:1' },
+      el('div', { class: 'head' }, 'จ่ายแล้ว ' + sku),
+      box,
+      el('div', { class: 'before-after' }, 'ยอดใช้ได้ ',
+        el('b', null, fmt(data.usable_before)), ' → ', el('b', null, fmt(data.usable_after))))));
 }
 
 $('sell-form').addEventListener('submit', async (ev) => {
   ev.preventDefault();
   if (busy || !STATE || STATE.source !== 'api') return;
 
-  const sku = $('sku').value;
+  const sku = selectedSku;
   const qtyText = $('qty').value.trim();
   const patient = $('patient').value.trim();
   const pharm = $('pharm').value.trim();
@@ -491,8 +672,9 @@ $('sell-form').addEventListener('submit', async (ev) => {
 
   if (res.ok && data && data.ok) {
     showSuccess(sku, data);
+    newIds = new Set((data.lines || []).map((l) => l.dispense_id));
     $('patient').value = '';          // ล้างรหัสผู้ป่วยหลังขายสำเร็จ
-    await refresh(sku);               // ดึง /api/data ใหม่ ยอดอัปเดตโดยไม่รีเฟรชหน้า
+    await refresh();                  // ดึง /api/data ใหม่ ยอดอัปเดตโดยไม่รีเฟรชหน้า
   } else {
     if (res.status === 401) {         // รหัสร้านผิด: ล้างรหัสที่เก็บไว้
       ssDel(KEY_CODE);
@@ -505,12 +687,23 @@ $('sell-form').addEventListener('submit', async (ev) => {
   updateButton();
 });
 
-$('q').addEventListener('input', () => { if (STATE) renderOptions($('sku').value); });
-$('sku').addEventListener('change', () => { $('result').replaceChildren(); renderDrugInfo(); });
+/* ตัวช่วยกรอกจำนวน: ปุ่ม − / + และปุ่มจำนวนเร็ว (ไม่จำกัดค่าสูงสุด) */
+function currentQty() { const n = parseInt($('qty').value, 10); return Number.isFinite(n) ? n : 0; }
+function setQty(n) { $('qty').value = String(n); updateButton(); }
+$('minus').addEventListener('click', () => setQty(Math.max(1, currentQty() - 1)));
+$('plus').addEventListener('click', () => setQty(Math.max(1, currentQty() + 1)));
+for (const n of QUICK_QTY) {
+  const b = el('button', { type: 'button' }, String(n));
+  b.addEventListener('click', () => setQty(n));
+  $('quick').append(b);
+}
+$('qty').addEventListener('input', updateButton);
+$('q').addEventListener('input', () => { if (STATE) renderDrugList(); });
 
 // เติมรหัสจาก sessionStorage (ถ้าเคยกรอกในหน้านี้หรือ admin.html)
 $('code').value = ssGet(KEY_CODE);
 $('pharm').value = ssGet(KEY_RX);
+updateButton();
 refresh();
 </script>
 </body>
