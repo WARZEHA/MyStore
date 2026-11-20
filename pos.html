@@ -213,6 +213,38 @@
   .type.void { color: var(--red); }
   .type.return { color: var(--orange); }
 
+  /* ===== เอฟเฟกต์พื้นหลัง (แบบเดียวกับหน้าแรก แต่จางกว่า เพราะเป็นหน้าทำงาน) อยู่หลังเนื้อหา กดทะลุได้ ===== */
+  .home-back-bar, main { position: relative; z-index: 1; }
+  .bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .4; }
+  .blob.b1 { width: 520px; height: 520px; left: -160px; top: -140px; background: rgba(30, 215, 96, .26); animation: drift1 24s ease-in-out infinite; }
+  .blob.b2 { width: 460px; height: 460px; right: -180px; top: 35%; background: rgba(0, 170, 255, .14); animation: drift2 28s ease-in-out infinite; }
+  .blob.b3 { width: 420px; height: 420px; left: 30%; bottom: -220px; background: rgba(255, 164, 43, .10); animation: drift3 32s ease-in-out infinite; }
+  @keyframes drift1 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(220px, 140px) scale(1.15); } }
+  @keyframes drift2 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-240px, -120px) scale(1.2); } }
+  @keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(180px, -160px) scale(.9); } }
+  .particle { position: absolute; bottom: -60px; color: var(--green); animation: rise linear infinite; }
+  .particle svg { display: block; width: 100%; height: 100%; animation: sway ease-in-out infinite alternate; animation-duration: inherit; }
+  @keyframes rise {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10%  { opacity: var(--o); }
+    90%  { opacity: var(--o); }
+    100% { transform: translateY(calc(-100vh - 120px)) rotate(var(--r)); opacity: 0; }
+  }
+  @keyframes sway { from { transform: translateX(-18px); } to { transform: translateX(18px); } }
+  .bg::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%);
+            mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%);
+  }
+  .spot {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(300px circle at var(--mx, -500px) var(--my, -500px), rgba(30, 215, 96, .10), transparent 70%);
+  }
+
   /* เอฟเฟกต์ลอยและเคอร์เซอร์รูปมือ (ฟอร์มไม่ลอย เพื่อไม่รบกวนตอนพิมพ์) */
   @keyframes float {
     0%, 100% { transform: translateY(0); }
@@ -240,6 +272,10 @@
 </style>
 </head>
 <body>
+<div class="bg" id="bg" aria-hidden="true">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+</div>
+<div class="spot" id="spot" aria-hidden="true"></div>
 <nav class="home-back-bar" aria-label="กลับ"><a class="home-back" href="./index.html">‹ กลับหน้าแรก</a></nav>
 <main>
   <header class="app-head">
@@ -724,6 +760,42 @@ for (const n of QUICK_QTY) {
 }
 $('qty').addEventListener('input', updateButton);
 $('q').addEventListener('input', () => { if (STATE) renderDrugList(); });
+
+/* พื้นหลัง: เม็ดยา/กากบาท/วงกลมลอยขึ้นช้า ๆ (น้อยกว่าหน้าแรก) และแสงตามเมาส์ */
+(function makeParticles() {
+  const SHAPES = {
+    pill: ['M10.5 20.5l-7-7a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7z', 'M8.5 8.5l7 7'],
+    cross: ['M9 3h6v6h6v6h-6v6H9v-6H3V9h6z'],
+    dot: ['M12 6a6 6 0 1 0 0 12a6 6 0 1 0 0-12z'],
+  };
+  const names = ['pill', 'cross', 'pill', 'dot'];
+  const count = window.innerWidth < 600 ? 8 : 14;
+  for (let i = 0; i < count; i++) {
+    const size = 14 + Math.random() * 22;
+    const dur = 18 + Math.random() * 18;
+    const p = el('span', { class: 'particle' });
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.animationDuration = dur + 's';
+    p.style.animationDelay = (-Math.random() * dur) + 's';
+    p.style.setProperty('--o', (0.08 + Math.random() * 0.12).toFixed(2));
+    p.style.setProperty('--r', (Math.random() < .5 ? -1 : 1) * (90 + Math.random() * 270) + 'deg');
+    if (Math.random() < .25) p.style.color = '#ffa42b';
+    const svg = icon('');
+    for (const d of SHAPES[names[Math.floor(Math.random() * names.length)]]) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      svg.append(path);
+    }
+    p.append(svg);
+    $('bg').append(p);
+  }
+})();
+window.addEventListener('pointermove', (e) => {
+  $('spot').style.setProperty('--mx', e.clientX + 'px');
+  $('spot').style.setProperty('--my', e.clientY + 'px');
+}, { passive: true });
 
 // เติมรหัสจาก sessionStorage (ถ้าเคยกรอกในหน้านี้หรือ admin.html)
 $('code').value = ssGet(KEY_CODE);
