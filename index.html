@@ -242,8 +242,138 @@
   /* เคอร์เซอร์รูปมือทั้งหน้า (SVG ฝังในไฟล์ ไม่โหลดจากภายนอก) จุดคลิกอยู่ที่ปลายนิ้ว */
   html, body, * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg stroke-linecap='round' fill='none'%3E%3Cpath d='M12 1.2V3.6M6.2 3.2L8 5M17.8 3.2L16 5M3.6 8.4H6' stroke='%23000' stroke-width='3.6'/%3E%3Cpath d='M12 1.2V3.6M6.2 3.2L8 5M17.8 3.2L16 5M3.6 8.4H6' stroke='%23fff' stroke-width='1.6'/%3E%3C/g%3E%3Cpath d='M10 18V9a2 2 0 0 1 4 0v6a1.75 1.75 0 0 1 3.5 0v1a1.75 1.75 0 0 1 3.5 0v1a1.5 1.5 0 0 1 3 0v6c0 4-2.5 7-6 7h-3.5c-2 0-3.5-1-4.5-2.5L5.6 21.2a1.7 1.7 0 0 1 2.7-2L10 21z' fill='%23fff' stroke='%23000' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M14 15v4M17.5 16v3.5M21 17v3' stroke='%23000' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E") 12 7, pointer !important; }
 </style>
+<script>
+  // ตั้งโหมดสีก่อนหน้าเว็บแสดง กันจอกะพริบ (จำค่าที่เลือกไว้ในเบราว์เซอร์ ไม่ใช่ข้อมูลสำคัญ)
+  (function () {
+    var t = 'dark';
+    try { t = localStorage.getItem('rx_theme') || 'dark'; } catch (e) { /* ใช้โหมดมืด */ }
+    document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+  })();
+</script>
+<style id="theme">
+  /* ===== ปุ่มสลับโหมด ===== */
+  .theme-toggle {
+    position: fixed; top: 12px; right: 16px; z-index: 60;
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px;
+    border-radius: 9999px; border: 1px solid var(--line); background: var(--card); color: var(--text);
+    font: 600 15px 'Noto Sans Thai', system-ui, sans-serif; box-shadow: 0 6px 18px rgba(0, 0, 0, .3);
+    transition: transform .2s, box-shadow .2s, background .3s, color .3s;
+  }
+  .theme-toggle:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0, 0, 0, .35); }
+  .theme-toggle .tt-ico { font-size: 18px; line-height: 1; }
+  @media (max-width: 560px) { .theme-toggle .tt-text { display: none; } .theme-toggle { padding: 0 12px; } }
+  /* เปลี่ยนสีนุ่ม ๆ ตอนกดสลับ */
+  html.theme-anim, html.theme-anim * { transition: background-color .45s, color .45s, border-color .45s, fill .45s, stroke .45s !important; }
+
+  /* สีเม็ดยาลอย: โหมดมืดเขียว/ส้ม โหมดสว่างหลายสี */
+  .particle { color: var(--pc-dark, #1ed760); }
+  html[data-theme="light"] .particle { color: var(--pc-light, #ec4899); }
+
+  /* ===== โหมดสว่าง: พื้นขาวเป็นหลัก เอฟเฟกต์หลายสี ===== */
+  html[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f5f7fb; --card: #ffffff; --card-hover: #f7f9fc; --sub: #f3f5f9; --hover: #eef2f7;
+    --line: #e2e8f0; --border: #cbd5e1; --text: #0f172a; --muted: #5b6475;
+    --accent: #16a34a; --green: #16a34a; --green-bg: rgba(22, 163, 74, .10);
+    --orange: #d97706; --orange-bg: rgba(217, 119, 6, .12);
+    --red: #dc2626; --red-bg: rgba(220, 38, 38, .08);
+  }
+  html[data-theme="light"] body {
+    background:
+      radial-gradient(900px 420px at 10% -10%, rgba(236, 72, 153, .10), transparent 60%),
+      radial-gradient(800px 420px at 100% 0%, rgba(59, 130, 246, .10), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  html[data-theme="light"] .theme-toggle { box-shadow: 0 6px 18px rgba(15, 23, 42, .10); }
+  html[data-theme="light"] .notice { background: rgba(22, 163, 74, .08); border-color: rgba(22, 163, 74, .35); }
+
+  /* พื้นหลัง: แสงพาสเทลหลายสี ตารางเส้นเทา แสงตามเมาส์สีม่วง */
+  html[data-theme="light"] .blob { opacity: .75; }
+  html[data-theme="light"] .blob.b1 { background: rgba(236, 72, 153, .22); }
+  html[data-theme="light"] .blob.b2 { background: rgba(59, 130, 246, .22); }
+  html[data-theme="light"] .blob.b3 { background: rgba(250, 204, 21, .28); }
+  html[data-theme="light"] .bg::after {
+    background-image: linear-gradient(rgba(15, 23, 42, .05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(15, 23, 42, .05) 1px, transparent 1px);
+  }
+  html[data-theme="light"] .spot {
+    background: radial-gradient(320px circle at var(--mx, -500px) var(--my, -500px), rgba(168, 85, 247, .14), transparent 70%);
+  }
+
+  /* หน้าแรก: การ์ดเมนูคนละสี */
+  html[data-theme="light"] nav li:nth-child(1) { --c: #16a34a; }
+  html[data-theme="light"] nav li:nth-child(2) { --c: #9333ea; }
+  html[data-theme="light"] nav li:nth-child(3) { --c: #2563eb; }
+  html[data-theme="light"] nav li:nth-child(4) { --c: #db2777; }
+  html[data-theme="light"] nav .ico { color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); }
+  html[data-theme="light"] nav .btn.primary .ico { background: var(--c); color: #fff; }
+  html[data-theme="light"] nav .btn.primary { border-color: color-mix(in srgb, var(--c) 45%, transparent); }
+  html[data-theme="light"] nav li .btn { animation-name: float-shadow-light; }
+  html[data-theme="light"] .btn:hover {
+    border-color: var(--c);
+    box-shadow: 0 24px 40px rgba(15, 23, 42, .14), 0 0 0 2px var(--c), 0 10px 32px color-mix(in srgb, var(--c) 30%, transparent) !important;
+  }
+  html[data-theme="light"] .btn:hover .arrow { color: var(--c); }
+  @keyframes float-shadow-light {
+    0%, 100% { box-shadow: 0 6px 14px rgba(15, 23, 42, .07); }
+    50%      { box-shadow: 0 22px 34px rgba(15, 23, 42, .12), 0 0 24px color-mix(in srgb, var(--c, #a855f7) 18%, transparent); }
+  }
+  html[data-theme="light"] .stat { box-shadow: 0 4px 14px rgba(15, 23, 42, .05); }
+  html[data-theme="light"] .stats .stat:nth-child(1) .v { color: #2563eb; }
+
+  /* มาสคอต: แขนขาเข้มให้เห็นบนพื้นขาว เงาเบาลง */
+  html[data-theme="light"] .runner .limbs { stroke: #1b3a57; }
+  html[data-theme="light"] .runner svg { filter: drop-shadow(0 6px 10px rgba(15, 23, 42, .18)); }
+  html[data-theme="light"] .bird svg { filter: drop-shadow(0 8px 12px rgba(15, 23, 42, .18)); }
+  html[data-theme="light"] .dust { background: rgba(100, 116, 139, .35); }
+  html[data-theme="light"] .bubble { border: 1px solid #e2e8f0; box-shadow: 0 6px 16px rgba(15, 23, 42, .15); }
+
+  /* หน้าขายยา */
+  html[data-theme="light"] .card { box-shadow: 0 8px 24px rgba(15, 23, 42, .06); }
+  html[data-theme="light"] .card:hover { box-shadow: 0 14px 34px rgba(15, 23, 42, .10); }
+  html[data-theme="light"] .fallback { background: #fff7e6; color: #92400e; }
+  html[data-theme="light"] .fatal { background: #fef2f2; color: #991b1b; }
+  html[data-theme="light"] .msg.err { color: #991b1b; }
+  html[data-theme="light"] .msg.ok { color: #14532d; }
+  html[data-theme="light"] .line { background: rgba(15, 23, 42, .05); }
+  html[data-theme="light"] tbody tr:hover { background: rgba(15, 23, 42, .03); }
+  html[data-theme="light"] input::placeholder { color: #94a3b8; }
+  html[data-theme="light"] .btn-sell:disabled { background: #e2e8f0; color: #94a3b8; }
+  html[data-theme="light"] .drug:hover { box-shadow: 0 12px 24px rgba(15, 23, 42, .12), 0 0 0 1px var(--green); }
+  html[data-theme="light"] .round:hover,
+  html[data-theme="light"] .quick button:hover { box-shadow: 0 10px 22px rgba(168, 85, 247, .22); border-color: #a855f7; color: #7e22ce; }
+  html[data-theme="light"] .btn-sell:hover:not(:disabled) { box-shadow: 0 18px 34px rgba(22, 163, 74, .35); }
+  html[data-theme="light"] .step.s1 .step-n { background: #16a34a; color: #fff; }
+  html[data-theme="light"] .step.s2 .step-n { background: #2563eb; color: #fff; }
+  html[data-theme="light"] .step.s3 .step-n { background: #db2777; color: #fff; }
+</style>
 </head>
 <body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="สลับโหมดสีมืดและสว่าง">
+  <span class="tt-ico" aria-hidden="true"></span><span class="tt-text"></span>
+</button>
+<script>
+  // ปุ่มสลับโหมด มืด / สว่าง (ข้อความใส่ด้วย textContent)
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    function label() {
+      var light = root.getAttribute('data-theme') === 'light';
+      btn.querySelector('.tt-ico').textContent = light ? '🌙' : '☀️';
+      btn.querySelector('.tt-text').textContent = light ? 'โหมดมืด' : 'โหมดสว่าง';
+      btn.setAttribute('aria-pressed', light ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.classList.add('theme-anim');
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('rx_theme', next); } catch (e) { /* จำไม่ได้ก็ใช้ได้ */ }
+      label();
+      setTimeout(function () { root.classList.remove('theme-anim'); }, 500);
+    });
+    label();
+  })();
+</script>
 <div class="bg" id="bg" aria-hidden="true">
   <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
 </div>
@@ -306,7 +436,7 @@
     <div class="runner-body">
       <span class="dust"></span><span class="dust d2"></span>
       <svg viewBox="0 0 72 76">
-        <g stroke="#f2f2f2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <g class="limbs" stroke="#f2f2f2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
           <path class="leg-a" d="M31 52 L29 66 L33.5 66"/>
           <path class="leg-b" d="M41 52 L43 66 L47.5 66"/>
           <path class="arm-a" d="M21 34 L12 41" style="transform-origin: 100% 0"/>
@@ -420,7 +550,8 @@
       p.style.animationDelay = (-Math.random() * dur) + 's';   // เริ่มกระจายทั่วจอทันที
       p.style.setProperty('--o', (0.35 + Math.random() * 0.30).toFixed(2));
       p.style.setProperty('--r', (Math.random() < .5 ? -1 : 1) * (90 + Math.random() * 270) + 'deg');
-      if (Math.random() < .25) p.style.color = '#ffa42b';
+      p.style.setProperty('--pc-dark', Math.random() < .25 ? '#ffa42b' : '#1ed760');
+      p.style.setProperty('--pc-light', ['#ec4899', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#06b6d4', '#ef4444'][Math.floor(Math.random() * 7)]);
       const svg = icon('');            // SVG เปล่า (เส้นตาม currentColor) แล้วเติมรูปทรงที่สุ่มได้
       const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
       for (const d of SHAPE_PATHS[shape]) {
