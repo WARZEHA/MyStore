@@ -206,6 +206,27 @@
   @keyframes dust { 0% { transform: translate(0, 0) scale(.6); opacity: .9; } 100% { transform: translate(-22px, -8px) scale(1.6); opacity: 0; } }
   @keyframes jump { 0% { transform: translateY(0); } 40% { transform: translateY(-46px) rotate(-12deg); } 100% { transform: translateY(0); } }
 
+  /* นกน้อยคาบยา บินไปกลับด้านบน (วาดเอง) ไม่บังการกด */
+  .bird { position: fixed; top: 70px; left: 0; z-index: 40; width: 92px; height: 72px; pointer-events: none;
+          animation: fly-x 22s linear infinite; }
+  .bird-y { width: 100%; height: 100%; animation: fly-y 6s ease-in-out infinite alternate; }
+  .bird-face { width: 100%; height: 100%; animation: turn 22s linear infinite; }
+  .bird-bob { width: 100%; height: 100%; animation: bird-bob .45s ease-in-out infinite alternate; }
+  .bird svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .45)); }
+  .wing { transform-box: fill-box; transform-origin: 85% 80%; animation: flap .22s ease-in-out infinite alternate; }
+  @keyframes fly-x {
+    0%   { transform: translateX(-120px); }
+    50%  { transform: translateX(calc(100vw + 20px)); }
+    100% { transform: translateX(-120px); }
+  }
+  @keyframes fly-y { from { transform: translateY(0); } to { transform: translateY(190px); } }
+  @keyframes bird-bob { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-6px) rotate(3deg); } }
+  @keyframes flap { from { transform: rotate(-28deg); } to { transform: rotate(22deg); } }
+
+  /* กล่องคำพูดเด้งขึ้นเอง */
+  .bubble { transform: translateX(-50%) scale(.6); transition: opacity .25s, transform .3s cubic-bezier(.3, 1.6, .5, 1); }
+  .runner.talk .bubble { transform: translateX(-50%) scale(1); }
+
   /* ผู้ใช้ที่ตั้งค่า "ลดการเคลื่อนไหว" ในระบบ: ปิดการลอยต่อเนื่อง แต่ยังยกขึ้นเมื่อชี้เมาส์ */
   @media (prefers-reduced-motion: reduce) {
     nav li, nav li .btn, nav li .ico svg, .logo { animation: none; }
@@ -241,7 +262,37 @@
   <footer>Workshop ร้านยาจำลอง</footer>
 </main>
 
-<!-- มาสคอตแคปซูลยา (ตกแต่ง) กดแล้วกระโดดและพูด -->
+<!-- นกน้อยคาบยา (ตกแต่ง) -->
+<div class="bird" aria-hidden="true">
+  <div class="bird-y"><div class="bird-face"><div class="bird-bob">
+    <svg viewBox="0 0 92 72">
+      <!-- หาง -->
+      <path d="M26 38 L8 28 L13 40 L7 50 L27 45 Z" fill="#5aa9e6" stroke="#1b3a57" stroke-width="2" stroke-linejoin="round"/>
+      <!-- ตัวกลม -->
+      <circle cx="44" cy="38" r="22" fill="#7cc8ff" stroke="#1b3a57" stroke-width="2.2"/>
+      <ellipse cx="47" cy="46" rx="14" ry="10" fill="#eaf7ff"/>
+      <!-- จุกบนหัว -->
+      <path d="M42 17 q1-9 8-8 q-5 3-3 9" fill="#5aa9e6" stroke="#1b3a57" stroke-width="1.8" stroke-linejoin="round"/>
+      <!-- ตา แก้ม -->
+      <circle cx="54" cy="31" r="3.6" fill="#1b3a57"/><circle cx="55.3" cy="29.7" r="1.3" fill="#fff"/>
+      <circle cx="56" cy="40" r="3.2" fill="#f3727f" opacity=".75"/>
+      <!-- ขา -->
+      <path d="M40 59 l-2 6 M48 59 l2 6" stroke="#ffa42b" stroke-width="2.6" stroke-linecap="round"/>
+      <!-- ปีก (กระพือ) -->
+      <path class="wing" d="M44 38 q-15-20-29-8 q11 4 15 13 q8 3 14-5z" fill="#5aa9e6" stroke="#1b3a57" stroke-width="2" stroke-linejoin="round"/>
+      <!-- จะงอยปาก -->
+      <path d="M64 31 L76 35 L64 40 Z" fill="#ffa42b" stroke="#1b3a57" stroke-width="1.8" stroke-linejoin="round"/>
+      <!-- แคปซูลยาที่คาบ -->
+      <g transform="translate(70 36) rotate(-12)">
+        <path d="M4.5 -4.5 h6 v9 h-6 a4.5 4.5 0 0 1 0 -9 z" fill="#1ed760"/>
+        <path d="M10.5 -4.5 h6 a4.5 4.5 0 0 1 0 9 h-6 z" fill="#ffffff"/>
+        <rect x="0" y="-4.5" width="21" height="9" rx="4.5" fill="none" stroke="#1b3a57" stroke-width="1.6"/>
+      </g>
+    </svg>
+  </div></div></div>
+</div>
+
+<!-- มาสคอตแคปซูลยา (ตกแต่ง) พูดเองเป็นระยะ กดแล้วกระโดด -->
 <div class="runner" id="runner" aria-hidden="true">
   <div class="bubble" id="bubble"></div>
   <div class="runner-face">
@@ -382,17 +433,27 @@
     spot.style.setProperty('--my', e.clientY + 'px');
   }, { passive: true });
 
-  // มาสคอต: กดแล้วกระโดดและพูดข้อความสุ่ม (ข้อความคงที่ ใช้ textContent)
-  const SAYINGS = ['สวัสดี!', 'สู้ ๆ นะ!', 'อย่าลืมดื่มน้ำ!', 'ยาพร้อมขายแล้ว!', 'กินยาให้ตรงเวลานะ'];
+  // มาสคอต: พูดเองเป็นระยะ (แสดง 3.5 วินาที เว้น 1.5 วินาที วนข้อความ) กดแล้วกระโดดและพูดทันที
+  // ข้อความคงที่ ใส่ด้วย textContent
+  const SAYINGS = ['สวัสดี!', 'สู้ ๆ นะ!', 'อย่าลืมดื่มน้ำ!', 'ยาพร้อมขายแล้ว!', 'กินยาให้ตรงเวลานะ',
+                   'พักสายตาบ้างนะ', 'วันนี้ก็สดใส!', 'นกน้อยส่งยามาแล้ว!'];
   const runner = document.getElementById('runner');
-  let talkTimer = null;
+  const bubble = document.getElementById('bubble');
+  let sayIndex = 0, hideTimer = null;
+  function say(text, ms) {
+    bubble.textContent = text;
+    runner.classList.add('talk');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => runner.classList.remove('talk', 'jump'), ms);
+  }
+  function sayNext() { say(SAYINGS[sayIndex++ % SAYINGS.length], 3500); }
+  setTimeout(sayNext, 800);
+  setInterval(sayNext, 5000);
   runner.addEventListener('click', function () {
-    document.getElementById('bubble').textContent = SAYINGS[Math.floor(Math.random() * SAYINGS.length)];
     runner.classList.remove('jump');
     void runner.offsetWidth;           // เริ่มท่ากระโดดใหม่ทุกครั้งที่กด
-    runner.classList.add('jump', 'talk');
-    clearTimeout(talkTimer);
-    talkTimer = setTimeout(() => runner.classList.remove('talk', 'jump'), 1800);
+    runner.classList.add('jump');
+    say(SAYINGS[Math.floor(Math.random() * SAYINGS.length)], 2200);
   });
 
   // แถบสรุป: อ่าน /api/data (หมดเวลา 8 วินาที) ถ้าอ่านไม่ได้ก็ซ่อนแถบ หน้าเมนูยังใช้ได้ตามปกติ
