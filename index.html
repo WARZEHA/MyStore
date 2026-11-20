@@ -33,7 +33,7 @@
     line-height: 1.6;
     min-height: 100vh;
   }
-  main { max-width: 880px; margin: 0 auto; padding: 40px 16px 48px; }
+  main { max-width: 880px; margin: 0 auto; padding: 40px 16px 120px; }  /* เว้นล่างให้มาสคอตวิ่ง */
 
   /* ส่วนหัว */
   .hero { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
@@ -131,6 +131,46 @@
   }
   .btn:hover .ico { transform: rotate(-10deg) scale(1.15); }
   .ico { transition: transform .25s; }
+  /* มาสคอตแคปซูลยาวิ่งไปมาที่ขอบล่าง (วาดเอง ไม่ใช่ตัวละครที่มีลิขสิทธิ์) */
+  .runner {
+    position: fixed; left: 0; bottom: 10px; z-index: 50; width: 72px; height: 76px;
+    animation: run-x 16s linear infinite;
+  }
+  .runner-face { width: 100%; height: 100%; animation: turn 16s linear infinite; }
+  .runner-body { width: 100%; height: 100%; animation: hop .36s ease-in-out infinite; transform-origin: 50% 100%; }
+  .runner svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 6px 10px rgba(30, 215, 96, .35)); }
+  .leg-a, .leg-b { transform-box: fill-box; transform-origin: 50% 0; }
+  .leg-a { animation: leg .36s ease-in-out infinite; }
+  .leg-b { animation: leg .36s ease-in-out infinite reverse; }
+  .arm-a, .arm-b { transform-box: fill-box; transform-origin: 0 0; }
+  .arm-a { animation: arm .36s ease-in-out infinite; }
+  .arm-b { animation: arm .36s ease-in-out infinite reverse; }
+  .dust { position: absolute; bottom: 4px; left: 4px; width: 10px; height: 10px; border-radius: 50%;
+          background: rgba(179, 179, 179, .35); animation: dust .72s ease-out infinite; }
+  .dust.d2 { animation-delay: .36s; }
+  .bubble {
+    position: absolute; bottom: 82px; left: 50%; transform: translateX(-50%);
+    white-space: nowrap; background: #fff; color: #121212; font-weight: 700; font-size: 15px;
+    padding: 4px 12px; border-radius: 12px; box-shadow: 0 6px 16px rgba(0, 0, 0, .4);
+    opacity: 0; transition: opacity .2s; pointer-events: none;
+  }
+  .bubble::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px;
+                   border: 6px solid transparent; border-top-color: #fff; }
+  .runner.talk .bubble { opacity: 1; }
+  .runner.jump .runner-body { animation: jump .6s ease-out; }
+  .runner:hover, .runner:hover .runner-face { animation-play-state: paused; }
+  @keyframes run-x {
+    0%   { transform: translateX(-90px); }
+    50%  { transform: translateX(calc(100vw + 10px)); }
+    100% { transform: translateX(-90px); }
+  }
+  @keyframes turn { 0%, 49.99% { transform: scaleX(1); } 50%, 100% { transform: scaleX(-1); } }
+  @keyframes hop { 0%, 100% { transform: translateY(0) rotate(4deg); } 50% { transform: translateY(-7px) rotate(4deg); } }
+  @keyframes leg { 0%, 100% { transform: rotate(32deg); } 50% { transform: rotate(-32deg); } }
+  @keyframes arm { 0%, 100% { transform: rotate(-35deg); } 50% { transform: rotate(35deg); } }
+  @keyframes dust { 0% { transform: translate(0, 0) scale(.6); opacity: .9; } 100% { transform: translate(-22px, -8px) scale(1.6); opacity: 0; } }
+  @keyframes jump { 0% { transform: translateY(0); } 40% { transform: translateY(-46px) rotate(-12deg); } 100% { transform: translateY(0); } }
+
   /* ผู้ใช้ที่ตั้งค่า "ลดการเคลื่อนไหว" ในระบบ: ปิดการลอยต่อเนื่อง แต่ยังยกขึ้นเมื่อชี้เมาส์ */
   @media (prefers-reduced-motion: reduce) {
     nav li, nav li .btn, nav li .ico svg, .logo { animation: none; }
@@ -161,6 +201,34 @@
   <nav aria-label="เมนูหลัก"><ul id="menu"></ul></nav>
   <footer>Workshop ร้านยาจำลอง</footer>
 </main>
+
+<!-- มาสคอตแคปซูลยา (ตกแต่ง) กดแล้วกระโดดและพูด -->
+<div class="runner" id="runner" aria-hidden="true">
+  <div class="bubble" id="bubble"></div>
+  <div class="runner-face">
+    <div class="runner-body">
+      <span class="dust"></span><span class="dust d2"></span>
+      <svg viewBox="0 0 72 76">
+        <g stroke="#f2f2f2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <path class="leg-a" d="M31 52 L29 66 L33.5 66"/>
+          <path class="leg-b" d="M41 52 L43 66 L47.5 66"/>
+          <path class="arm-a" d="M21 34 L12 41" style="transform-origin: 100% 0"/>
+          <path class="arm-b" d="M51 34 L60 41"/>
+        </g>
+        <path d="M20 30V22a16 16 0 0 1 32 0v8z" fill="#1ed760"/>
+        <path d="M20 30h32v8a16 16 0 0 1-32 0z" fill="#ffffff"/>
+        <rect x="20" y="6" width="32" height="48" rx="16" fill="none" stroke="#0b2a17" stroke-width="2.5"/>
+        <path d="M20 30h32" stroke="#0b2a17" stroke-width="2"/>
+        <circle cx="32" cy="19" r="3" fill="#0b2a17"/><circle cx="33" cy="18" r="1" fill="#fff"/>
+        <circle cx="42" cy="19" r="3" fill="#0b2a17"/><circle cx="43" cy="18" r="1" fill="#fff"/>
+        <circle cx="28" cy="25" r="2.4" fill="#f3727f" opacity=".85"/>
+        <circle cx="46" cy="25" r="2.4" fill="#f3727f" opacity=".85"/>
+        <path d="M34 24.5q3 3.2 6 0" fill="none" stroke="#0b2a17" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M27 40h6M30 37v6" stroke="#1ed760" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
 <script>
   // รายการลิงก์ เพิ่มหรือลบหน้าได้ด้วยการแก้หนึ่งบรรทัด
   // หน้าที่ยังไม่ได้ push จะขึ้น 404 จนกว่าจะมีไฟล์นั้น (ไม่ต้องซ่อนปุ่ม)
@@ -231,6 +299,19 @@
     a.append(ico, txt, arrow);
     li.append(a);
     menu.append(li);
+  });
+
+  // มาสคอต: กดแล้วกระโดดและพูดข้อความสุ่ม (ข้อความคงที่ ใช้ textContent)
+  const SAYINGS = ['สวัสดี!', 'สู้ ๆ นะ!', 'อย่าลืมดื่มน้ำ!', 'ยาพร้อมขายแล้ว!', 'กินยาให้ตรงเวลานะ'];
+  const runner = document.getElementById('runner');
+  let talkTimer = null;
+  runner.addEventListener('click', function () {
+    document.getElementById('bubble').textContent = SAYINGS[Math.floor(Math.random() * SAYINGS.length)];
+    runner.classList.remove('jump');
+    void runner.offsetWidth;           // เริ่มท่ากระโดดใหม่ทุกครั้งที่กด
+    runner.classList.add('jump', 'talk');
+    clearTimeout(talkTimer);
+    talkTimer = setTimeout(() => runner.classList.remove('talk', 'jump'), 1800);
   });
 
   // แถบสรุป: อ่าน /api/data (หมดเวลา 8 วินาที) ถ้าอ่านไม่ได้ก็ซ่อนแถบ หน้าเมนูยังใช้ได้ตามปกติ
